@@ -1,0 +1,38 @@
+Resolving dependencies...
+Note: test_api is pinned to version 0.7.6 by flutter_test from the flutter SDK.
+See https://dart.dev/go/sdk-version-pinning for details.
+
+The current Dart SDK version is 3.9.2.
+
+    Because no versions of riverpod_annotation match >4.0.1 <5.0.0 and riverpod_annotation 4.0.1 depends on riverpod 3.2.0, riverpod_annotation ^4.0.1 requires riverpod 3.2.0.
+(1) So, because riverpod 3.2.0 depends on test ^1.0.0 and test >=1.21.6 <1.24.4 depends on analyzer >=2.0.0 <6.0.0, riverpod_annotation ^4.0.1 requires analyzer >=2.0.0 <6.0.0 or test >=1.0.0 <1.21.6-∞ or >=1.24.4 <2.0.0.
+
+    Because test >=1.16.6 <1.17.10 depends on analyzer ^1.0.0 and test >=1.17.10 <1.20.0 depends on analyzer >=1.0.0 <3.0.0, test >=1.16.6 <1.20.0 requires analyzer >=1.0.0 <3.0.0.
+    And because test >=1.20.0 <1.21.2 depends on test_api 0.4.9 and test >=1.21.0 <1.21.6 depends on analyzer >=2.0.0 <5.0.0, test >=1.16.6 <1.21.6 requires analyzer >=1.0.0 <5.0.0 or test_api 0.4.9.
+    And because riverpod_annotation ^4.0.1 requires analyzer >=2.0.0 <6.0.0 or test >=1.0.0 <1.21.6-∞ or >=1.24.4 <2.0.0 (1), riverpod_annotation ^4.0.1 requires analyzer >=1.0.0 <6.0.0 or test_api 0.4.9 or test >=1.0.0 <1.16.6-∞ or >=1.24.4 <2.0.0.
+    Because test >=1.25.9 <1.26.3 depends on analyzer >=6.0.0 <8.0.0 and test >=1.24.4 <1.25.9 depends on analyzer >=5.12.0 <7.0.0, test >=1.24.4 <1.26.3 requires analyzer >=5.12.0 <8.0.0.
+    Thus, riverpod_annotation ^4.0.1 requires analyzer >=1.0.0 <8.0.0 or test_api 0.4.9 or test >=1.0.0 <1.16.6-∞ or >=1.26.3 <2.0.0.
+(2) So, because json_serializable >=6.11.4 depends on analyzer >=9.0.0 <11.0.0, if riverpod_annotation ^4.0.1 and json_serializable >=6.11.4 then test_api 0.4.9 or test >=1.0.0 <1.16.6-∞ or >=1.26.3 <2.0.0.
+
+    Because json_serializable <4.1.0 doesn't support null safety and json_serializable >=4.1.0 <6.9.0 depends on build ^2.0.0, json_serializable <6.9.0 requires build ^2.0.0.
+    And because json_serializable >=6.8.0 <6.12.0 depends on json_annotation >=4.9.0 <4.10.0 and freezed >=3.2.3 depends on build >=3.0.0 <5.0.0, if json_serializable <6.12.0 and freezed >=3.2.3 then json_annotation >=4.9.0 <4.10.0.
+    And because if riverpod_annotation ^4.0.1 and json_serializable >=6.11.4 then test_api 0.4.9 or test >=1.0.0 <1.16.6-∞ or >=1.26.3 <2.0.0 (2), if riverpod_annotation ^4.0.1 and freezed >=3.2.3 and json_serializable any then test_api 0.4.9 or test >=1.0.0 <1.16.6-∞ or >=1.26.3 <2.0.0 or json_annotation >=4.9.0 <4.10.0.
+    And because test >=1.26.3 <1.27.0 depends on test_api 0.7.7 and test >=1.16.0-nullsafety.19 <1.16.6 depends on test_api 0.2.19, if riverpod_annotation ^4.0.1 and freezed >=3.2.3 and json_serializable any then test_api 0.2.19 or 0.4.9 or 0.7.7 or json_annotation >=4.9.0 <4.10.0 or test >=1.0.0 <1.16.0-nullsafety.19 or >=1.27.0 <2.0.0.
+    Because test >=1.29.0 depends on test_api 0.7.9 and test >=1.27.0 <1.29.0 depends on test_api 0.7.8, test >=1.27.0 requires test_api 0.7.8 or 0.7.9.
+    Thus, if riverpod_annotation ^4.0.1 and freezed >=3.2.3 and json_serializable any then test_api 0.2.19 or 0.4.9 or 0.7.7 or 0.7.8 or 0.7.9 or json_annotation >=4.9.0 <4.10.0 or test >=1.0.0 <1.16.0-nullsafety.19.
+    And because every version of flutter_test from sdk depends on test_api 0.7.6 and test >=0.12.0-beta.3 <1.16.0-nullsafety.8 doesn't support null safety, if riverpod_annotation ^4.0.1 and freezed >=3.2.3 and json_serializable any and flutter_test from sdk then json_annotation >=4.9.0 <4.10.0 or test >=1.16.0-nullsafety.8 <1.16.0-nullsafety.19.
+    And because test >=1.16.0-nullsafety.8 <1.16.3 depends on web_socket_channel ^1.0.0 and build_runner >=2.4.15 depends on web_socket_channel >=2.3.0 <4.0.0, if riverpod_annotation ^4.0.1 and freezed >=3.2.3 and json_serializable any and flutter_test from sdk and build_runner >=2.4.15 then json_annotation >=4.9.0 <4.10.0.
+    And because unihealthai depends on both riverpod_annotation ^4.0.1 and json_annotation ^4.10.0, one of freezed >=3.2.3 or json_serializable any or flutter_test from sdk or build_runner >=2.4.15 must be false.
+    And because unihealthai depends on both flutter_test from sdk and build_runner ^2.7.1, freezed >=3.2.3 is incompatible with json_serializable.
+    So, because unihealthai depends on both freezed ^3.2.3 and json_serializable any, version solving failed.
+
+The lower bound of "sdk: '>=1.22.1 <3.0.0'" must be 2.12.0 or higher to enable null safety.
+For details, see https://dart.dev/null-safety
+
+The lower bound of "sdk: '>=1.8.0 <3.0.0'" must be 2.12.0 or higher to enable null safety.
+For details, see https://dart.dev/null-safety
+
+
+You can try the following suggestion to make the pubspec resolve:
+* Consider downgrading your constraint on json_annotation: flutter pub add json_annotation:^4.9.0
+Failed to update packages.

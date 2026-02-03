@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:unihealthai/features/patients/application/visit_notifier.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/patient_entity.dart';
+import '../../../chat/presentation/widgets/ai_chat_widget.dart';
 import 'add_edit_visit_screen.dart';
 
 class PatientDetailsScreen extends ConsumerStatefulWidget {
@@ -16,6 +17,8 @@ class PatientDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen> {
+  bool _isChatOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -31,46 +34,71 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.patient.name),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildPatientInfoCard(),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Visits History',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle, color: Colors.blue),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddEditVisitScreen(
-                            patientId: widget.patient.id,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              if (visitState.isLoading)
-                const Center(child: CircularProgressIndicator())
-              else if (visitState.visits.isEmpty)
-                const Text('No visits recorded.')
-              else
-                ...visitState.visits.map((visit) => _buildVisitCard(visit)),
-            ],
+        actions: [
+          IconButton(
+            icon: Icon(
+                _isChatOpen ? Icons.chat_bubble : Icons.chat_bubble_outline),
+            onPressed: () {
+              setState(() {
+                _isChatOpen = !_isChatOpen;
+              });
+            },
           ),
-        ),
+        ],
+      ),
+      body: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildPatientInfoCard(),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Visits History',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
+                        IconButton(
+                          icon:
+                              const Icon(Icons.add_circle, color: Colors.blue),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddEditVisitScreen(
+                                  patientId: widget.patient.id,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    if (visitState.isLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else if (visitState.visits.isEmpty)
+                      const Text('No visits recorded.')
+                    else
+                      ...visitState.visits
+                          .map((visit) => _buildVisitCard(visit)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (_isChatOpen)
+            Expanded(
+              flex: 1,
+              child: AIChatWidget(),
+            ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

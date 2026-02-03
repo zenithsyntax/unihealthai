@@ -15,11 +15,49 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PatientEntity {
   String get id;
-  String get doctorId;
-  String get name;
-  int get age;
+  String get doctorId; // 🧍 Personal / Demographics
+  String get firstName;
+  String get lastName;
   String get gender;
+  DateTime get dateOfBirth;
+  String get nationality;
+  String get maritalStatus;
+  String get occupation; // 📞 Contact / Emergency
   String get contactNumber;
+  String get emergencyContactName;
+  String get emergencyContactPhone;
+  String get emergencyContactRelationship; // 🏥 Medical History
+  String get bloodType;
+  bool get hasHeartCondition;
+  bool get hasDiabetes;
+  bool get hasAsthma;
+  bool get hasHighBloodPressure;
+  bool get hasSurgicalHistory;
+  String? get surgeryDetails;
+  String? get familyMedicalHistory; // 💊 Medications & Allergies
+  bool get isTakingMedication;
+  String? get currentMedications;
+  String? get drugAllergyDetails;
+  String? get foodAllergyDetails; // 🧠 Mental & Lifestyle
+  String? get mentalHealthNotes;
+  String get smokingStatus;
+  String get alcoholConsumption;
+  String get physicalActivityLevel;
+  int? get sleepHoursPerNight; // 📏 Body Metrics / Vitals
+  double get height; // in cm
+  double get weight; // in kg
+  double? get bmi;
+  int? get restingHeartRate;
+  String? get bloodPressure; // 📄 Administrative / Consent
+  String? get insuranceProvider;
+  String? get insurancePolicyNumber;
+  bool get consentToTreatment;
+  DateTime? get consentDate;
+  String? get notes; // 🗂 Files / Metadata
+  String? get profilePhotoUrl;
+  List<String> get additionalDocuments;
+  DateTime get createdAt;
+  DateTime get updatedAt; // Visits
   List<VisitEntity> get visits;
 
   /// Create a copy of PatientEntity
@@ -38,21 +76,139 @@ mixin _$PatientEntity {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.doctorId, doctorId) ||
                 other.doctorId == doctorId) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.age, age) || other.age == age) &&
+            (identical(other.firstName, firstName) ||
+                other.firstName == firstName) &&
+            (identical(other.lastName, lastName) ||
+                other.lastName == lastName) &&
             (identical(other.gender, gender) || other.gender == gender) &&
+            (identical(other.dateOfBirth, dateOfBirth) ||
+                other.dateOfBirth == dateOfBirth) &&
+            (identical(other.nationality, nationality) ||
+                other.nationality == nationality) &&
+            (identical(other.maritalStatus, maritalStatus) ||
+                other.maritalStatus == maritalStatus) &&
+            (identical(other.occupation, occupation) ||
+                other.occupation == occupation) &&
             (identical(other.contactNumber, contactNumber) ||
                 other.contactNumber == contactNumber) &&
+            (identical(other.emergencyContactName, emergencyContactName) ||
+                other.emergencyContactName == emergencyContactName) &&
+            (identical(other.emergencyContactPhone, emergencyContactPhone) ||
+                other.emergencyContactPhone == emergencyContactPhone) &&
+            (identical(other.emergencyContactRelationship, emergencyContactRelationship) ||
+                other.emergencyContactRelationship ==
+                    emergencyContactRelationship) &&
+            (identical(other.bloodType, bloodType) ||
+                other.bloodType == bloodType) &&
+            (identical(other.hasHeartCondition, hasHeartCondition) ||
+                other.hasHeartCondition == hasHeartCondition) &&
+            (identical(other.hasDiabetes, hasDiabetes) ||
+                other.hasDiabetes == hasDiabetes) &&
+            (identical(other.hasAsthma, hasAsthma) ||
+                other.hasAsthma == hasAsthma) &&
+            (identical(other.hasHighBloodPressure, hasHighBloodPressure) ||
+                other.hasHighBloodPressure == hasHighBloodPressure) &&
+            (identical(other.hasSurgicalHistory, hasSurgicalHistory) ||
+                other.hasSurgicalHistory == hasSurgicalHistory) &&
+            (identical(other.surgeryDetails, surgeryDetails) ||
+                other.surgeryDetails == surgeryDetails) &&
+            (identical(other.familyMedicalHistory, familyMedicalHistory) ||
+                other.familyMedicalHistory == familyMedicalHistory) &&
+            (identical(other.isTakingMedication, isTakingMedication) ||
+                other.isTakingMedication == isTakingMedication) &&
+            (identical(other.currentMedications, currentMedications) ||
+                other.currentMedications == currentMedications) &&
+            (identical(other.drugAllergyDetails, drugAllergyDetails) ||
+                other.drugAllergyDetails == drugAllergyDetails) &&
+            (identical(other.foodAllergyDetails, foodAllergyDetails) ||
+                other.foodAllergyDetails == foodAllergyDetails) &&
+            (identical(other.mentalHealthNotes, mentalHealthNotes) ||
+                other.mentalHealthNotes == mentalHealthNotes) &&
+            (identical(other.smokingStatus, smokingStatus) ||
+                other.smokingStatus == smokingStatus) &&
+            (identical(other.alcoholConsumption, alcoholConsumption) ||
+                other.alcoholConsumption == alcoholConsumption) &&
+            (identical(other.physicalActivityLevel, physicalActivityLevel) ||
+                other.physicalActivityLevel == physicalActivityLevel) &&
+            (identical(other.sleepHoursPerNight, sleepHoursPerNight) ||
+                other.sleepHoursPerNight == sleepHoursPerNight) &&
+            (identical(other.height, height) || other.height == height) &&
+            (identical(other.weight, weight) || other.weight == weight) &&
+            (identical(other.bmi, bmi) || other.bmi == bmi) &&
+            (identical(other.restingHeartRate, restingHeartRate) ||
+                other.restingHeartRate == restingHeartRate) &&
+            (identical(other.bloodPressure, bloodPressure) ||
+                other.bloodPressure == bloodPressure) &&
+            (identical(other.insuranceProvider, insuranceProvider) ||
+                other.insuranceProvider == insuranceProvider) &&
+            (identical(other.insurancePolicyNumber, insurancePolicyNumber) ||
+                other.insurancePolicyNumber == insurancePolicyNumber) &&
+            (identical(other.consentToTreatment, consentToTreatment) ||
+                other.consentToTreatment == consentToTreatment) &&
+            (identical(other.consentDate, consentDate) ||
+                other.consentDate == consentDate) &&
+            (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.profilePhotoUrl, profilePhotoUrl) ||
+                other.profilePhotoUrl == profilePhotoUrl) &&
+            const DeepCollectionEquality().equals(other.additionalDocuments, additionalDocuments) &&
+            (identical(other.createdAt, createdAt) || other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt) &&
             const DeepCollectionEquality().equals(other.visits, visits));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, doctorId, name, age, gender,
-      contactNumber, const DeepCollectionEquality().hash(visits));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        doctorId,
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        nationality,
+        maritalStatus,
+        occupation,
+        contactNumber,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship,
+        bloodType,
+        hasHeartCondition,
+        hasDiabetes,
+        hasAsthma,
+        hasHighBloodPressure,
+        hasSurgicalHistory,
+        surgeryDetails,
+        familyMedicalHistory,
+        isTakingMedication,
+        currentMedications,
+        drugAllergyDetails,
+        foodAllergyDetails,
+        mentalHealthNotes,
+        smokingStatus,
+        alcoholConsumption,
+        physicalActivityLevel,
+        sleepHoursPerNight,
+        height,
+        weight,
+        bmi,
+        restingHeartRate,
+        bloodPressure,
+        insuranceProvider,
+        insurancePolicyNumber,
+        consentToTreatment,
+        consentDate,
+        notes,
+        profilePhotoUrl,
+        const DeepCollectionEquality().hash(additionalDocuments),
+        createdAt,
+        updatedAt,
+        const DeepCollectionEquality().hash(visits)
+      ]);
 
   @override
   String toString() {
-    return 'PatientEntity(id: $id, doctorId: $doctorId, name: $name, age: $age, gender: $gender, contactNumber: $contactNumber, visits: $visits)';
+    return 'PatientEntity(id: $id, doctorId: $doctorId, firstName: $firstName, lastName: $lastName, gender: $gender, dateOfBirth: $dateOfBirth, nationality: $nationality, maritalStatus: $maritalStatus, occupation: $occupation, contactNumber: $contactNumber, emergencyContactName: $emergencyContactName, emergencyContactPhone: $emergencyContactPhone, emergencyContactRelationship: $emergencyContactRelationship, bloodType: $bloodType, hasHeartCondition: $hasHeartCondition, hasDiabetes: $hasDiabetes, hasAsthma: $hasAsthma, hasHighBloodPressure: $hasHighBloodPressure, hasSurgicalHistory: $hasSurgicalHistory, surgeryDetails: $surgeryDetails, familyMedicalHistory: $familyMedicalHistory, isTakingMedication: $isTakingMedication, currentMedications: $currentMedications, drugAllergyDetails: $drugAllergyDetails, foodAllergyDetails: $foodAllergyDetails, mentalHealthNotes: $mentalHealthNotes, smokingStatus: $smokingStatus, alcoholConsumption: $alcoholConsumption, physicalActivityLevel: $physicalActivityLevel, sleepHoursPerNight: $sleepHoursPerNight, height: $height, weight: $weight, bmi: $bmi, restingHeartRate: $restingHeartRate, bloodPressure: $bloodPressure, insuranceProvider: $insuranceProvider, insurancePolicyNumber: $insurancePolicyNumber, consentToTreatment: $consentToTreatment, consentDate: $consentDate, notes: $notes, profilePhotoUrl: $profilePhotoUrl, additionalDocuments: $additionalDocuments, createdAt: $createdAt, updatedAt: $updatedAt, visits: $visits)';
   }
 }
 
@@ -65,10 +221,48 @@ abstract mixin class $PatientEntityCopyWith<$Res> {
   $Res call(
       {String id,
       String doctorId,
-      String name,
-      int age,
+      String firstName,
+      String lastName,
       String gender,
+      DateTime dateOfBirth,
+      String nationality,
+      String maritalStatus,
+      String occupation,
       String contactNumber,
+      String emergencyContactName,
+      String emergencyContactPhone,
+      String emergencyContactRelationship,
+      String bloodType,
+      bool hasHeartCondition,
+      bool hasDiabetes,
+      bool hasAsthma,
+      bool hasHighBloodPressure,
+      bool hasSurgicalHistory,
+      String? surgeryDetails,
+      String? familyMedicalHistory,
+      bool isTakingMedication,
+      String? currentMedications,
+      String? drugAllergyDetails,
+      String? foodAllergyDetails,
+      String? mentalHealthNotes,
+      String smokingStatus,
+      String alcoholConsumption,
+      String physicalActivityLevel,
+      int? sleepHoursPerNight,
+      double height,
+      double weight,
+      double? bmi,
+      int? restingHeartRate,
+      String? bloodPressure,
+      String? insuranceProvider,
+      String? insurancePolicyNumber,
+      bool consentToTreatment,
+      DateTime? consentDate,
+      String? notes,
+      String? profilePhotoUrl,
+      List<String> additionalDocuments,
+      DateTime createdAt,
+      DateTime updatedAt,
       List<VisitEntity> visits});
 }
 
@@ -87,10 +281,48 @@ class _$PatientEntityCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? doctorId = null,
-    Object? name = null,
-    Object? age = null,
+    Object? firstName = null,
+    Object? lastName = null,
     Object? gender = null,
+    Object? dateOfBirth = null,
+    Object? nationality = null,
+    Object? maritalStatus = null,
+    Object? occupation = null,
     Object? contactNumber = null,
+    Object? emergencyContactName = null,
+    Object? emergencyContactPhone = null,
+    Object? emergencyContactRelationship = null,
+    Object? bloodType = null,
+    Object? hasHeartCondition = null,
+    Object? hasDiabetes = null,
+    Object? hasAsthma = null,
+    Object? hasHighBloodPressure = null,
+    Object? hasSurgicalHistory = null,
+    Object? surgeryDetails = freezed,
+    Object? familyMedicalHistory = freezed,
+    Object? isTakingMedication = null,
+    Object? currentMedications = freezed,
+    Object? drugAllergyDetails = freezed,
+    Object? foodAllergyDetails = freezed,
+    Object? mentalHealthNotes = freezed,
+    Object? smokingStatus = null,
+    Object? alcoholConsumption = null,
+    Object? physicalActivityLevel = null,
+    Object? sleepHoursPerNight = freezed,
+    Object? height = null,
+    Object? weight = null,
+    Object? bmi = freezed,
+    Object? restingHeartRate = freezed,
+    Object? bloodPressure = freezed,
+    Object? insuranceProvider = freezed,
+    Object? insurancePolicyNumber = freezed,
+    Object? consentToTreatment = null,
+    Object? consentDate = freezed,
+    Object? notes = freezed,
+    Object? profilePhotoUrl = freezed,
+    Object? additionalDocuments = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
     Object? visits = null,
   }) {
     return _then(_self.copyWith(
@@ -102,22 +334,174 @@ class _$PatientEntityCopyWithImpl<$Res>
           ? _self.doctorId
           : doctorId // ignore: cast_nullable_to_non_nullable
               as String,
-      name: null == name
-          ? _self.name
-          : name // ignore: cast_nullable_to_non_nullable
+      firstName: null == firstName
+          ? _self.firstName
+          : firstName // ignore: cast_nullable_to_non_nullable
               as String,
-      age: null == age
-          ? _self.age
-          : age // ignore: cast_nullable_to_non_nullable
-              as int,
+      lastName: null == lastName
+          ? _self.lastName
+          : lastName // ignore: cast_nullable_to_non_nullable
+              as String,
       gender: null == gender
           ? _self.gender
           : gender // ignore: cast_nullable_to_non_nullable
+              as String,
+      dateOfBirth: null == dateOfBirth
+          ? _self.dateOfBirth
+          : dateOfBirth // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      nationality: null == nationality
+          ? _self.nationality
+          : nationality // ignore: cast_nullable_to_non_nullable
+              as String,
+      maritalStatus: null == maritalStatus
+          ? _self.maritalStatus
+          : maritalStatus // ignore: cast_nullable_to_non_nullable
+              as String,
+      occupation: null == occupation
+          ? _self.occupation
+          : occupation // ignore: cast_nullable_to_non_nullable
               as String,
       contactNumber: null == contactNumber
           ? _self.contactNumber
           : contactNumber // ignore: cast_nullable_to_non_nullable
               as String,
+      emergencyContactName: null == emergencyContactName
+          ? _self.emergencyContactName
+          : emergencyContactName // ignore: cast_nullable_to_non_nullable
+              as String,
+      emergencyContactPhone: null == emergencyContactPhone
+          ? _self.emergencyContactPhone
+          : emergencyContactPhone // ignore: cast_nullable_to_non_nullable
+              as String,
+      emergencyContactRelationship: null == emergencyContactRelationship
+          ? _self.emergencyContactRelationship
+          : emergencyContactRelationship // ignore: cast_nullable_to_non_nullable
+              as String,
+      bloodType: null == bloodType
+          ? _self.bloodType
+          : bloodType // ignore: cast_nullable_to_non_nullable
+              as String,
+      hasHeartCondition: null == hasHeartCondition
+          ? _self.hasHeartCondition
+          : hasHeartCondition // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasDiabetes: null == hasDiabetes
+          ? _self.hasDiabetes
+          : hasDiabetes // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasAsthma: null == hasAsthma
+          ? _self.hasAsthma
+          : hasAsthma // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasHighBloodPressure: null == hasHighBloodPressure
+          ? _self.hasHighBloodPressure
+          : hasHighBloodPressure // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasSurgicalHistory: null == hasSurgicalHistory
+          ? _self.hasSurgicalHistory
+          : hasSurgicalHistory // ignore: cast_nullable_to_non_nullable
+              as bool,
+      surgeryDetails: freezed == surgeryDetails
+          ? _self.surgeryDetails
+          : surgeryDetails // ignore: cast_nullable_to_non_nullable
+              as String?,
+      familyMedicalHistory: freezed == familyMedicalHistory
+          ? _self.familyMedicalHistory
+          : familyMedicalHistory // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isTakingMedication: null == isTakingMedication
+          ? _self.isTakingMedication
+          : isTakingMedication // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentMedications: freezed == currentMedications
+          ? _self.currentMedications
+          : currentMedications // ignore: cast_nullable_to_non_nullable
+              as String?,
+      drugAllergyDetails: freezed == drugAllergyDetails
+          ? _self.drugAllergyDetails
+          : drugAllergyDetails // ignore: cast_nullable_to_non_nullable
+              as String?,
+      foodAllergyDetails: freezed == foodAllergyDetails
+          ? _self.foodAllergyDetails
+          : foodAllergyDetails // ignore: cast_nullable_to_non_nullable
+              as String?,
+      mentalHealthNotes: freezed == mentalHealthNotes
+          ? _self.mentalHealthNotes
+          : mentalHealthNotes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      smokingStatus: null == smokingStatus
+          ? _self.smokingStatus
+          : smokingStatus // ignore: cast_nullable_to_non_nullable
+              as String,
+      alcoholConsumption: null == alcoholConsumption
+          ? _self.alcoholConsumption
+          : alcoholConsumption // ignore: cast_nullable_to_non_nullable
+              as String,
+      physicalActivityLevel: null == physicalActivityLevel
+          ? _self.physicalActivityLevel
+          : physicalActivityLevel // ignore: cast_nullable_to_non_nullable
+              as String,
+      sleepHoursPerNight: freezed == sleepHoursPerNight
+          ? _self.sleepHoursPerNight
+          : sleepHoursPerNight // ignore: cast_nullable_to_non_nullable
+              as int?,
+      height: null == height
+          ? _self.height
+          : height // ignore: cast_nullable_to_non_nullable
+              as double,
+      weight: null == weight
+          ? _self.weight
+          : weight // ignore: cast_nullable_to_non_nullable
+              as double,
+      bmi: freezed == bmi
+          ? _self.bmi
+          : bmi // ignore: cast_nullable_to_non_nullable
+              as double?,
+      restingHeartRate: freezed == restingHeartRate
+          ? _self.restingHeartRate
+          : restingHeartRate // ignore: cast_nullable_to_non_nullable
+              as int?,
+      bloodPressure: freezed == bloodPressure
+          ? _self.bloodPressure
+          : bloodPressure // ignore: cast_nullable_to_non_nullable
+              as String?,
+      insuranceProvider: freezed == insuranceProvider
+          ? _self.insuranceProvider
+          : insuranceProvider // ignore: cast_nullable_to_non_nullable
+              as String?,
+      insurancePolicyNumber: freezed == insurancePolicyNumber
+          ? _self.insurancePolicyNumber
+          : insurancePolicyNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      consentToTreatment: null == consentToTreatment
+          ? _self.consentToTreatment
+          : consentToTreatment // ignore: cast_nullable_to_non_nullable
+              as bool,
+      consentDate: freezed == consentDate
+          ? _self.consentDate
+          : consentDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      notes: freezed == notes
+          ? _self.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      profilePhotoUrl: freezed == profilePhotoUrl
+          ? _self.profilePhotoUrl
+          : profilePhotoUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      additionalDocuments: null == additionalDocuments
+          ? _self.additionalDocuments
+          : additionalDocuments // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _self.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       visits: null == visits
           ? _self.visits
           : visits // ignore: cast_nullable_to_non_nullable
@@ -219,16 +603,104 @@ extension PatientEntityPatterns on PatientEntity {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String doctorId, String name, int age,
-            String gender, String contactNumber, List<VisitEntity> visits)?
+    TResult Function(
+            String id,
+            String doctorId,
+            String firstName,
+            String lastName,
+            String gender,
+            DateTime dateOfBirth,
+            String nationality,
+            String maritalStatus,
+            String occupation,
+            String contactNumber,
+            String emergencyContactName,
+            String emergencyContactPhone,
+            String emergencyContactRelationship,
+            String bloodType,
+            bool hasHeartCondition,
+            bool hasDiabetes,
+            bool hasAsthma,
+            bool hasHighBloodPressure,
+            bool hasSurgicalHistory,
+            String? surgeryDetails,
+            String? familyMedicalHistory,
+            bool isTakingMedication,
+            String? currentMedications,
+            String? drugAllergyDetails,
+            String? foodAllergyDetails,
+            String? mentalHealthNotes,
+            String smokingStatus,
+            String alcoholConsumption,
+            String physicalActivityLevel,
+            int? sleepHoursPerNight,
+            double height,
+            double weight,
+            double? bmi,
+            int? restingHeartRate,
+            String? bloodPressure,
+            String? insuranceProvider,
+            String? insurancePolicyNumber,
+            bool consentToTreatment,
+            DateTime? consentDate,
+            String? notes,
+            String? profilePhotoUrl,
+            List<String> additionalDocuments,
+            DateTime createdAt,
+            DateTime updatedAt,
+            List<VisitEntity> visits)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _PatientEntity() when $default != null:
-        return $default(_that.id, _that.doctorId, _that.name, _that.age,
-            _that.gender, _that.contactNumber, _that.visits);
+        return $default(
+            _that.id,
+            _that.doctorId,
+            _that.firstName,
+            _that.lastName,
+            _that.gender,
+            _that.dateOfBirth,
+            _that.nationality,
+            _that.maritalStatus,
+            _that.occupation,
+            _that.contactNumber,
+            _that.emergencyContactName,
+            _that.emergencyContactPhone,
+            _that.emergencyContactRelationship,
+            _that.bloodType,
+            _that.hasHeartCondition,
+            _that.hasDiabetes,
+            _that.hasAsthma,
+            _that.hasHighBloodPressure,
+            _that.hasSurgicalHistory,
+            _that.surgeryDetails,
+            _that.familyMedicalHistory,
+            _that.isTakingMedication,
+            _that.currentMedications,
+            _that.drugAllergyDetails,
+            _that.foodAllergyDetails,
+            _that.mentalHealthNotes,
+            _that.smokingStatus,
+            _that.alcoholConsumption,
+            _that.physicalActivityLevel,
+            _that.sleepHoursPerNight,
+            _that.height,
+            _that.weight,
+            _that.bmi,
+            _that.restingHeartRate,
+            _that.bloodPressure,
+            _that.insuranceProvider,
+            _that.insurancePolicyNumber,
+            _that.consentToTreatment,
+            _that.consentDate,
+            _that.notes,
+            _that.profilePhotoUrl,
+            _that.additionalDocuments,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.visits);
       case _:
         return orElse();
     }
@@ -249,15 +721,103 @@ extension PatientEntityPatterns on PatientEntity {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String doctorId, String name, int age,
-            String gender, String contactNumber, List<VisitEntity> visits)
+    TResult Function(
+            String id,
+            String doctorId,
+            String firstName,
+            String lastName,
+            String gender,
+            DateTime dateOfBirth,
+            String nationality,
+            String maritalStatus,
+            String occupation,
+            String contactNumber,
+            String emergencyContactName,
+            String emergencyContactPhone,
+            String emergencyContactRelationship,
+            String bloodType,
+            bool hasHeartCondition,
+            bool hasDiabetes,
+            bool hasAsthma,
+            bool hasHighBloodPressure,
+            bool hasSurgicalHistory,
+            String? surgeryDetails,
+            String? familyMedicalHistory,
+            bool isTakingMedication,
+            String? currentMedications,
+            String? drugAllergyDetails,
+            String? foodAllergyDetails,
+            String? mentalHealthNotes,
+            String smokingStatus,
+            String alcoholConsumption,
+            String physicalActivityLevel,
+            int? sleepHoursPerNight,
+            double height,
+            double weight,
+            double? bmi,
+            int? restingHeartRate,
+            String? bloodPressure,
+            String? insuranceProvider,
+            String? insurancePolicyNumber,
+            bool consentToTreatment,
+            DateTime? consentDate,
+            String? notes,
+            String? profilePhotoUrl,
+            List<String> additionalDocuments,
+            DateTime createdAt,
+            DateTime updatedAt,
+            List<VisitEntity> visits)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _PatientEntity():
-        return $default(_that.id, _that.doctorId, _that.name, _that.age,
-            _that.gender, _that.contactNumber, _that.visits);
+        return $default(
+            _that.id,
+            _that.doctorId,
+            _that.firstName,
+            _that.lastName,
+            _that.gender,
+            _that.dateOfBirth,
+            _that.nationality,
+            _that.maritalStatus,
+            _that.occupation,
+            _that.contactNumber,
+            _that.emergencyContactName,
+            _that.emergencyContactPhone,
+            _that.emergencyContactRelationship,
+            _that.bloodType,
+            _that.hasHeartCondition,
+            _that.hasDiabetes,
+            _that.hasAsthma,
+            _that.hasHighBloodPressure,
+            _that.hasSurgicalHistory,
+            _that.surgeryDetails,
+            _that.familyMedicalHistory,
+            _that.isTakingMedication,
+            _that.currentMedications,
+            _that.drugAllergyDetails,
+            _that.foodAllergyDetails,
+            _that.mentalHealthNotes,
+            _that.smokingStatus,
+            _that.alcoholConsumption,
+            _that.physicalActivityLevel,
+            _that.sleepHoursPerNight,
+            _that.height,
+            _that.weight,
+            _that.bmi,
+            _that.restingHeartRate,
+            _that.bloodPressure,
+            _that.insuranceProvider,
+            _that.insurancePolicyNumber,
+            _that.consentToTreatment,
+            _that.consentDate,
+            _that.notes,
+            _that.profilePhotoUrl,
+            _that.additionalDocuments,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.visits);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -277,15 +837,103 @@ extension PatientEntityPatterns on PatientEntity {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String doctorId, String name, int age,
-            String gender, String contactNumber, List<VisitEntity> visits)?
+    TResult? Function(
+            String id,
+            String doctorId,
+            String firstName,
+            String lastName,
+            String gender,
+            DateTime dateOfBirth,
+            String nationality,
+            String maritalStatus,
+            String occupation,
+            String contactNumber,
+            String emergencyContactName,
+            String emergencyContactPhone,
+            String emergencyContactRelationship,
+            String bloodType,
+            bool hasHeartCondition,
+            bool hasDiabetes,
+            bool hasAsthma,
+            bool hasHighBloodPressure,
+            bool hasSurgicalHistory,
+            String? surgeryDetails,
+            String? familyMedicalHistory,
+            bool isTakingMedication,
+            String? currentMedications,
+            String? drugAllergyDetails,
+            String? foodAllergyDetails,
+            String? mentalHealthNotes,
+            String smokingStatus,
+            String alcoholConsumption,
+            String physicalActivityLevel,
+            int? sleepHoursPerNight,
+            double height,
+            double weight,
+            double? bmi,
+            int? restingHeartRate,
+            String? bloodPressure,
+            String? insuranceProvider,
+            String? insurancePolicyNumber,
+            bool consentToTreatment,
+            DateTime? consentDate,
+            String? notes,
+            String? profilePhotoUrl,
+            List<String> additionalDocuments,
+            DateTime createdAt,
+            DateTime updatedAt,
+            List<VisitEntity> visits)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _PatientEntity() when $default != null:
-        return $default(_that.id, _that.doctorId, _that.name, _that.age,
-            _that.gender, _that.contactNumber, _that.visits);
+        return $default(
+            _that.id,
+            _that.doctorId,
+            _that.firstName,
+            _that.lastName,
+            _that.gender,
+            _that.dateOfBirth,
+            _that.nationality,
+            _that.maritalStatus,
+            _that.occupation,
+            _that.contactNumber,
+            _that.emergencyContactName,
+            _that.emergencyContactPhone,
+            _that.emergencyContactRelationship,
+            _that.bloodType,
+            _that.hasHeartCondition,
+            _that.hasDiabetes,
+            _that.hasAsthma,
+            _that.hasHighBloodPressure,
+            _that.hasSurgicalHistory,
+            _that.surgeryDetails,
+            _that.familyMedicalHistory,
+            _that.isTakingMedication,
+            _that.currentMedications,
+            _that.drugAllergyDetails,
+            _that.foodAllergyDetails,
+            _that.mentalHealthNotes,
+            _that.smokingStatus,
+            _that.alcoholConsumption,
+            _that.physicalActivityLevel,
+            _that.sleepHoursPerNight,
+            _that.height,
+            _that.weight,
+            _that.bmi,
+            _that.restingHeartRate,
+            _that.bloodPressure,
+            _that.insuranceProvider,
+            _that.insurancePolicyNumber,
+            _that.consentToTreatment,
+            _that.consentDate,
+            _that.notes,
+            _that.profilePhotoUrl,
+            _that.additionalDocuments,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.visits);
       case _:
         return null;
     }
@@ -294,30 +942,166 @@ extension PatientEntityPatterns on PatientEntity {
 
 /// @nodoc
 
-class _PatientEntity implements PatientEntity {
+class _PatientEntity extends PatientEntity {
   const _PatientEntity(
       {required this.id,
       required this.doctorId,
-      required this.name,
-      required this.age,
+      required this.firstName,
+      required this.lastName,
       required this.gender,
+      required this.dateOfBirth,
+      required this.nationality,
+      required this.maritalStatus,
+      required this.occupation,
       required this.contactNumber,
+      required this.emergencyContactName,
+      required this.emergencyContactPhone,
+      required this.emergencyContactRelationship,
+      required this.bloodType,
+      required this.hasHeartCondition,
+      required this.hasDiabetes,
+      required this.hasAsthma,
+      required this.hasHighBloodPressure,
+      required this.hasSurgicalHistory,
+      this.surgeryDetails,
+      this.familyMedicalHistory,
+      required this.isTakingMedication,
+      this.currentMedications,
+      this.drugAllergyDetails,
+      this.foodAllergyDetails,
+      this.mentalHealthNotes,
+      required this.smokingStatus,
+      required this.alcoholConsumption,
+      required this.physicalActivityLevel,
+      this.sleepHoursPerNight,
+      required this.height,
+      required this.weight,
+      this.bmi,
+      this.restingHeartRate,
+      this.bloodPressure,
+      this.insuranceProvider,
+      this.insurancePolicyNumber,
+      required this.consentToTreatment,
+      this.consentDate,
+      this.notes,
+      this.profilePhotoUrl,
+      final List<String> additionalDocuments = const [],
+      required this.createdAt,
+      required this.updatedAt,
       final List<VisitEntity> visits = const []})
-      : _visits = visits;
+      : _additionalDocuments = additionalDocuments,
+        _visits = visits,
+        super._();
 
   @override
   final String id;
   @override
   final String doctorId;
+// 🧍 Personal / Demographics
   @override
-  final String name;
+  final String firstName;
   @override
-  final int age;
+  final String lastName;
   @override
   final String gender;
   @override
+  final DateTime dateOfBirth;
+  @override
+  final String nationality;
+  @override
+  final String maritalStatus;
+  @override
+  final String occupation;
+// 📞 Contact / Emergency
+  @override
   final String contactNumber;
+  @override
+  final String emergencyContactName;
+  @override
+  final String emergencyContactPhone;
+  @override
+  final String emergencyContactRelationship;
+// 🏥 Medical History
+  @override
+  final String bloodType;
+  @override
+  final bool hasHeartCondition;
+  @override
+  final bool hasDiabetes;
+  @override
+  final bool hasAsthma;
+  @override
+  final bool hasHighBloodPressure;
+  @override
+  final bool hasSurgicalHistory;
+  @override
+  final String? surgeryDetails;
+  @override
+  final String? familyMedicalHistory;
+// 💊 Medications & Allergies
+  @override
+  final bool isTakingMedication;
+  @override
+  final String? currentMedications;
+  @override
+  final String? drugAllergyDetails;
+  @override
+  final String? foodAllergyDetails;
+// 🧠 Mental & Lifestyle
+  @override
+  final String? mentalHealthNotes;
+  @override
+  final String smokingStatus;
+  @override
+  final String alcoholConsumption;
+  @override
+  final String physicalActivityLevel;
+  @override
+  final int? sleepHoursPerNight;
+// 📏 Body Metrics / Vitals
+  @override
+  final double height;
+// in cm
+  @override
+  final double weight;
+// in kg
+  @override
+  final double? bmi;
+  @override
+  final int? restingHeartRate;
+  @override
+  final String? bloodPressure;
+// 📄 Administrative / Consent
+  @override
+  final String? insuranceProvider;
+  @override
+  final String? insurancePolicyNumber;
+  @override
+  final bool consentToTreatment;
+  @override
+  final DateTime? consentDate;
+  @override
+  final String? notes;
+// 🗂 Files / Metadata
+  @override
+  final String? profilePhotoUrl;
+  final List<String> _additionalDocuments;
+  @override
+  @JsonKey()
+  List<String> get additionalDocuments {
+    if (_additionalDocuments is EqualUnmodifiableListView)
+      return _additionalDocuments;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_additionalDocuments);
+  }
+
+  @override
+  final DateTime createdAt;
+  @override
+  final DateTime updatedAt;
+// Visits
   final List<VisitEntity> _visits;
+// Visits
   @override
   @JsonKey()
   List<VisitEntity> get visits {
@@ -342,21 +1126,139 @@ class _PatientEntity implements PatientEntity {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.doctorId, doctorId) ||
                 other.doctorId == doctorId) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.age, age) || other.age == age) &&
+            (identical(other.firstName, firstName) ||
+                other.firstName == firstName) &&
+            (identical(other.lastName, lastName) ||
+                other.lastName == lastName) &&
             (identical(other.gender, gender) || other.gender == gender) &&
+            (identical(other.dateOfBirth, dateOfBirth) ||
+                other.dateOfBirth == dateOfBirth) &&
+            (identical(other.nationality, nationality) ||
+                other.nationality == nationality) &&
+            (identical(other.maritalStatus, maritalStatus) ||
+                other.maritalStatus == maritalStatus) &&
+            (identical(other.occupation, occupation) ||
+                other.occupation == occupation) &&
             (identical(other.contactNumber, contactNumber) ||
                 other.contactNumber == contactNumber) &&
+            (identical(other.emergencyContactName, emergencyContactName) ||
+                other.emergencyContactName == emergencyContactName) &&
+            (identical(other.emergencyContactPhone, emergencyContactPhone) ||
+                other.emergencyContactPhone == emergencyContactPhone) &&
+            (identical(other.emergencyContactRelationship, emergencyContactRelationship) ||
+                other.emergencyContactRelationship ==
+                    emergencyContactRelationship) &&
+            (identical(other.bloodType, bloodType) ||
+                other.bloodType == bloodType) &&
+            (identical(other.hasHeartCondition, hasHeartCondition) ||
+                other.hasHeartCondition == hasHeartCondition) &&
+            (identical(other.hasDiabetes, hasDiabetes) ||
+                other.hasDiabetes == hasDiabetes) &&
+            (identical(other.hasAsthma, hasAsthma) ||
+                other.hasAsthma == hasAsthma) &&
+            (identical(other.hasHighBloodPressure, hasHighBloodPressure) ||
+                other.hasHighBloodPressure == hasHighBloodPressure) &&
+            (identical(other.hasSurgicalHistory, hasSurgicalHistory) ||
+                other.hasSurgicalHistory == hasSurgicalHistory) &&
+            (identical(other.surgeryDetails, surgeryDetails) ||
+                other.surgeryDetails == surgeryDetails) &&
+            (identical(other.familyMedicalHistory, familyMedicalHistory) ||
+                other.familyMedicalHistory == familyMedicalHistory) &&
+            (identical(other.isTakingMedication, isTakingMedication) ||
+                other.isTakingMedication == isTakingMedication) &&
+            (identical(other.currentMedications, currentMedications) ||
+                other.currentMedications == currentMedications) &&
+            (identical(other.drugAllergyDetails, drugAllergyDetails) ||
+                other.drugAllergyDetails == drugAllergyDetails) &&
+            (identical(other.foodAllergyDetails, foodAllergyDetails) ||
+                other.foodAllergyDetails == foodAllergyDetails) &&
+            (identical(other.mentalHealthNotes, mentalHealthNotes) ||
+                other.mentalHealthNotes == mentalHealthNotes) &&
+            (identical(other.smokingStatus, smokingStatus) ||
+                other.smokingStatus == smokingStatus) &&
+            (identical(other.alcoholConsumption, alcoholConsumption) ||
+                other.alcoholConsumption == alcoholConsumption) &&
+            (identical(other.physicalActivityLevel, physicalActivityLevel) ||
+                other.physicalActivityLevel == physicalActivityLevel) &&
+            (identical(other.sleepHoursPerNight, sleepHoursPerNight) ||
+                other.sleepHoursPerNight == sleepHoursPerNight) &&
+            (identical(other.height, height) || other.height == height) &&
+            (identical(other.weight, weight) || other.weight == weight) &&
+            (identical(other.bmi, bmi) || other.bmi == bmi) &&
+            (identical(other.restingHeartRate, restingHeartRate) ||
+                other.restingHeartRate == restingHeartRate) &&
+            (identical(other.bloodPressure, bloodPressure) ||
+                other.bloodPressure == bloodPressure) &&
+            (identical(other.insuranceProvider, insuranceProvider) ||
+                other.insuranceProvider == insuranceProvider) &&
+            (identical(other.insurancePolicyNumber, insurancePolicyNumber) ||
+                other.insurancePolicyNumber == insurancePolicyNumber) &&
+            (identical(other.consentToTreatment, consentToTreatment) ||
+                other.consentToTreatment == consentToTreatment) &&
+            (identical(other.consentDate, consentDate) ||
+                other.consentDate == consentDate) &&
+            (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.profilePhotoUrl, profilePhotoUrl) ||
+                other.profilePhotoUrl == profilePhotoUrl) &&
+            const DeepCollectionEquality().equals(other._additionalDocuments, _additionalDocuments) &&
+            (identical(other.createdAt, createdAt) || other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt) &&
             const DeepCollectionEquality().equals(other._visits, _visits));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, doctorId, name, age, gender,
-      contactNumber, const DeepCollectionEquality().hash(_visits));
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        doctorId,
+        firstName,
+        lastName,
+        gender,
+        dateOfBirth,
+        nationality,
+        maritalStatus,
+        occupation,
+        contactNumber,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship,
+        bloodType,
+        hasHeartCondition,
+        hasDiabetes,
+        hasAsthma,
+        hasHighBloodPressure,
+        hasSurgicalHistory,
+        surgeryDetails,
+        familyMedicalHistory,
+        isTakingMedication,
+        currentMedications,
+        drugAllergyDetails,
+        foodAllergyDetails,
+        mentalHealthNotes,
+        smokingStatus,
+        alcoholConsumption,
+        physicalActivityLevel,
+        sleepHoursPerNight,
+        height,
+        weight,
+        bmi,
+        restingHeartRate,
+        bloodPressure,
+        insuranceProvider,
+        insurancePolicyNumber,
+        consentToTreatment,
+        consentDate,
+        notes,
+        profilePhotoUrl,
+        const DeepCollectionEquality().hash(_additionalDocuments),
+        createdAt,
+        updatedAt,
+        const DeepCollectionEquality().hash(_visits)
+      ]);
 
   @override
   String toString() {
-    return 'PatientEntity(id: $id, doctorId: $doctorId, name: $name, age: $age, gender: $gender, contactNumber: $contactNumber, visits: $visits)';
+    return 'PatientEntity(id: $id, doctorId: $doctorId, firstName: $firstName, lastName: $lastName, gender: $gender, dateOfBirth: $dateOfBirth, nationality: $nationality, maritalStatus: $maritalStatus, occupation: $occupation, contactNumber: $contactNumber, emergencyContactName: $emergencyContactName, emergencyContactPhone: $emergencyContactPhone, emergencyContactRelationship: $emergencyContactRelationship, bloodType: $bloodType, hasHeartCondition: $hasHeartCondition, hasDiabetes: $hasDiabetes, hasAsthma: $hasAsthma, hasHighBloodPressure: $hasHighBloodPressure, hasSurgicalHistory: $hasSurgicalHistory, surgeryDetails: $surgeryDetails, familyMedicalHistory: $familyMedicalHistory, isTakingMedication: $isTakingMedication, currentMedications: $currentMedications, drugAllergyDetails: $drugAllergyDetails, foodAllergyDetails: $foodAllergyDetails, mentalHealthNotes: $mentalHealthNotes, smokingStatus: $smokingStatus, alcoholConsumption: $alcoholConsumption, physicalActivityLevel: $physicalActivityLevel, sleepHoursPerNight: $sleepHoursPerNight, height: $height, weight: $weight, bmi: $bmi, restingHeartRate: $restingHeartRate, bloodPressure: $bloodPressure, insuranceProvider: $insuranceProvider, insurancePolicyNumber: $insurancePolicyNumber, consentToTreatment: $consentToTreatment, consentDate: $consentDate, notes: $notes, profilePhotoUrl: $profilePhotoUrl, additionalDocuments: $additionalDocuments, createdAt: $createdAt, updatedAt: $updatedAt, visits: $visits)';
   }
 }
 
@@ -371,10 +1273,48 @@ abstract mixin class _$PatientEntityCopyWith<$Res>
   $Res call(
       {String id,
       String doctorId,
-      String name,
-      int age,
+      String firstName,
+      String lastName,
       String gender,
+      DateTime dateOfBirth,
+      String nationality,
+      String maritalStatus,
+      String occupation,
       String contactNumber,
+      String emergencyContactName,
+      String emergencyContactPhone,
+      String emergencyContactRelationship,
+      String bloodType,
+      bool hasHeartCondition,
+      bool hasDiabetes,
+      bool hasAsthma,
+      bool hasHighBloodPressure,
+      bool hasSurgicalHistory,
+      String? surgeryDetails,
+      String? familyMedicalHistory,
+      bool isTakingMedication,
+      String? currentMedications,
+      String? drugAllergyDetails,
+      String? foodAllergyDetails,
+      String? mentalHealthNotes,
+      String smokingStatus,
+      String alcoholConsumption,
+      String physicalActivityLevel,
+      int? sleepHoursPerNight,
+      double height,
+      double weight,
+      double? bmi,
+      int? restingHeartRate,
+      String? bloodPressure,
+      String? insuranceProvider,
+      String? insurancePolicyNumber,
+      bool consentToTreatment,
+      DateTime? consentDate,
+      String? notes,
+      String? profilePhotoUrl,
+      List<String> additionalDocuments,
+      DateTime createdAt,
+      DateTime updatedAt,
       List<VisitEntity> visits});
 }
 
@@ -393,10 +1333,48 @@ class __$PatientEntityCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? doctorId = null,
-    Object? name = null,
-    Object? age = null,
+    Object? firstName = null,
+    Object? lastName = null,
     Object? gender = null,
+    Object? dateOfBirth = null,
+    Object? nationality = null,
+    Object? maritalStatus = null,
+    Object? occupation = null,
     Object? contactNumber = null,
+    Object? emergencyContactName = null,
+    Object? emergencyContactPhone = null,
+    Object? emergencyContactRelationship = null,
+    Object? bloodType = null,
+    Object? hasHeartCondition = null,
+    Object? hasDiabetes = null,
+    Object? hasAsthma = null,
+    Object? hasHighBloodPressure = null,
+    Object? hasSurgicalHistory = null,
+    Object? surgeryDetails = freezed,
+    Object? familyMedicalHistory = freezed,
+    Object? isTakingMedication = null,
+    Object? currentMedications = freezed,
+    Object? drugAllergyDetails = freezed,
+    Object? foodAllergyDetails = freezed,
+    Object? mentalHealthNotes = freezed,
+    Object? smokingStatus = null,
+    Object? alcoholConsumption = null,
+    Object? physicalActivityLevel = null,
+    Object? sleepHoursPerNight = freezed,
+    Object? height = null,
+    Object? weight = null,
+    Object? bmi = freezed,
+    Object? restingHeartRate = freezed,
+    Object? bloodPressure = freezed,
+    Object? insuranceProvider = freezed,
+    Object? insurancePolicyNumber = freezed,
+    Object? consentToTreatment = null,
+    Object? consentDate = freezed,
+    Object? notes = freezed,
+    Object? profilePhotoUrl = freezed,
+    Object? additionalDocuments = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
     Object? visits = null,
   }) {
     return _then(_PatientEntity(
@@ -408,22 +1386,174 @@ class __$PatientEntityCopyWithImpl<$Res>
           ? _self.doctorId
           : doctorId // ignore: cast_nullable_to_non_nullable
               as String,
-      name: null == name
-          ? _self.name
-          : name // ignore: cast_nullable_to_non_nullable
+      firstName: null == firstName
+          ? _self.firstName
+          : firstName // ignore: cast_nullable_to_non_nullable
               as String,
-      age: null == age
-          ? _self.age
-          : age // ignore: cast_nullable_to_non_nullable
-              as int,
+      lastName: null == lastName
+          ? _self.lastName
+          : lastName // ignore: cast_nullable_to_non_nullable
+              as String,
       gender: null == gender
           ? _self.gender
           : gender // ignore: cast_nullable_to_non_nullable
+              as String,
+      dateOfBirth: null == dateOfBirth
+          ? _self.dateOfBirth
+          : dateOfBirth // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      nationality: null == nationality
+          ? _self.nationality
+          : nationality // ignore: cast_nullable_to_non_nullable
+              as String,
+      maritalStatus: null == maritalStatus
+          ? _self.maritalStatus
+          : maritalStatus // ignore: cast_nullable_to_non_nullable
+              as String,
+      occupation: null == occupation
+          ? _self.occupation
+          : occupation // ignore: cast_nullable_to_non_nullable
               as String,
       contactNumber: null == contactNumber
           ? _self.contactNumber
           : contactNumber // ignore: cast_nullable_to_non_nullable
               as String,
+      emergencyContactName: null == emergencyContactName
+          ? _self.emergencyContactName
+          : emergencyContactName // ignore: cast_nullable_to_non_nullable
+              as String,
+      emergencyContactPhone: null == emergencyContactPhone
+          ? _self.emergencyContactPhone
+          : emergencyContactPhone // ignore: cast_nullable_to_non_nullable
+              as String,
+      emergencyContactRelationship: null == emergencyContactRelationship
+          ? _self.emergencyContactRelationship
+          : emergencyContactRelationship // ignore: cast_nullable_to_non_nullable
+              as String,
+      bloodType: null == bloodType
+          ? _self.bloodType
+          : bloodType // ignore: cast_nullable_to_non_nullable
+              as String,
+      hasHeartCondition: null == hasHeartCondition
+          ? _self.hasHeartCondition
+          : hasHeartCondition // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasDiabetes: null == hasDiabetes
+          ? _self.hasDiabetes
+          : hasDiabetes // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasAsthma: null == hasAsthma
+          ? _self.hasAsthma
+          : hasAsthma // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasHighBloodPressure: null == hasHighBloodPressure
+          ? _self.hasHighBloodPressure
+          : hasHighBloodPressure // ignore: cast_nullable_to_non_nullable
+              as bool,
+      hasSurgicalHistory: null == hasSurgicalHistory
+          ? _self.hasSurgicalHistory
+          : hasSurgicalHistory // ignore: cast_nullable_to_non_nullable
+              as bool,
+      surgeryDetails: freezed == surgeryDetails
+          ? _self.surgeryDetails
+          : surgeryDetails // ignore: cast_nullable_to_non_nullable
+              as String?,
+      familyMedicalHistory: freezed == familyMedicalHistory
+          ? _self.familyMedicalHistory
+          : familyMedicalHistory // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isTakingMedication: null == isTakingMedication
+          ? _self.isTakingMedication
+          : isTakingMedication // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentMedications: freezed == currentMedications
+          ? _self.currentMedications
+          : currentMedications // ignore: cast_nullable_to_non_nullable
+              as String?,
+      drugAllergyDetails: freezed == drugAllergyDetails
+          ? _self.drugAllergyDetails
+          : drugAllergyDetails // ignore: cast_nullable_to_non_nullable
+              as String?,
+      foodAllergyDetails: freezed == foodAllergyDetails
+          ? _self.foodAllergyDetails
+          : foodAllergyDetails // ignore: cast_nullable_to_non_nullable
+              as String?,
+      mentalHealthNotes: freezed == mentalHealthNotes
+          ? _self.mentalHealthNotes
+          : mentalHealthNotes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      smokingStatus: null == smokingStatus
+          ? _self.smokingStatus
+          : smokingStatus // ignore: cast_nullable_to_non_nullable
+              as String,
+      alcoholConsumption: null == alcoholConsumption
+          ? _self.alcoholConsumption
+          : alcoholConsumption // ignore: cast_nullable_to_non_nullable
+              as String,
+      physicalActivityLevel: null == physicalActivityLevel
+          ? _self.physicalActivityLevel
+          : physicalActivityLevel // ignore: cast_nullable_to_non_nullable
+              as String,
+      sleepHoursPerNight: freezed == sleepHoursPerNight
+          ? _self.sleepHoursPerNight
+          : sleepHoursPerNight // ignore: cast_nullable_to_non_nullable
+              as int?,
+      height: null == height
+          ? _self.height
+          : height // ignore: cast_nullable_to_non_nullable
+              as double,
+      weight: null == weight
+          ? _self.weight
+          : weight // ignore: cast_nullable_to_non_nullable
+              as double,
+      bmi: freezed == bmi
+          ? _self.bmi
+          : bmi // ignore: cast_nullable_to_non_nullable
+              as double?,
+      restingHeartRate: freezed == restingHeartRate
+          ? _self.restingHeartRate
+          : restingHeartRate // ignore: cast_nullable_to_non_nullable
+              as int?,
+      bloodPressure: freezed == bloodPressure
+          ? _self.bloodPressure
+          : bloodPressure // ignore: cast_nullable_to_non_nullable
+              as String?,
+      insuranceProvider: freezed == insuranceProvider
+          ? _self.insuranceProvider
+          : insuranceProvider // ignore: cast_nullable_to_non_nullable
+              as String?,
+      insurancePolicyNumber: freezed == insurancePolicyNumber
+          ? _self.insurancePolicyNumber
+          : insurancePolicyNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
+      consentToTreatment: null == consentToTreatment
+          ? _self.consentToTreatment
+          : consentToTreatment // ignore: cast_nullable_to_non_nullable
+              as bool,
+      consentDate: freezed == consentDate
+          ? _self.consentDate
+          : consentDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      notes: freezed == notes
+          ? _self.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      profilePhotoUrl: freezed == profilePhotoUrl
+          ? _self.profilePhotoUrl
+          : profilePhotoUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      additionalDocuments: null == additionalDocuments
+          ? _self._additionalDocuments
+          : additionalDocuments // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _self.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       visits: null == visits
           ? _self._visits
           : visits // ignore: cast_nullable_to_non_nullable

@@ -12,8 +12,6 @@ import '../../features/patients/presentation/screens/patient_details_screen.dart
 import '../../features/patients/presentation/screens/add_patient_screen.dart';
 import '../../features/patients/domain/entities/patient_entity.dart';
 
-import 'package:unihealthai/core/widgets/scaffold_with_nav_bar.dart';
-
 // Provides the global generic GoRouter instance
 final routerProvider = Provider<GoRouter>((ref) {
   final authStateAsync = ref.watch(authStateChangesProvider);
@@ -42,16 +40,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/register',
           builder: (context, state) => const RegisterScreen()),
-      ShellRoute(
-          builder: (context, state, child) {
-            return ScaffoldWithNavBar(child: child);
-          },
-          routes: [
-            GoRoute(
-              path: '/',
-              builder: (context, state) => const DoctorDashboardScreen(),
-            ),
-          ]),
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const DoctorDashboardScreen(),
+      ),
       GoRoute(
         path: '/patient-details',
         builder: (context, state) {

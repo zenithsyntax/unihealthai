@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/patient_entity.dart';
 import '../../../chat/presentation/widgets/ai_chat_widget.dart';
 import 'add_edit_visit_screen.dart';
+import '../../../visit_chat/presentation/screens/visit_chat_screen.dart';
 
 class PatientDetailsScreen extends ConsumerStatefulWidget {
   final PatientEntity patient;
@@ -662,6 +663,36 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
                           ),
                           const Icon(Icons.arrow_forward_ios,
                               size: 16, color: AppTheme.textGrey),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // Action buttons
+                      Row(
+                        children: [
+                          Expanded(child: Container()), // Spacer
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => VisitChatScreen(
+                                    patientId: widget.patient.id,
+                                    visit: visit,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon:
+                                const Icon(Icons.chat_bubble_outline, size: 16),
+                            label: const Text('AI Assistant'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppTheme.primaryGreen,
+                              side: const BorderSide(
+                                  color: AppTheme.primaryGreen),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 12),

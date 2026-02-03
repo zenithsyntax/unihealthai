@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
+import '../../../../core/utils/failure.dart';
 import 'package:unihealthai/core/di/dependency_injection.dart';
 
 import '../domain/entities/patient_entity.dart';
@@ -26,36 +27,40 @@ class VisitNotifier extends Notifier<VisitState> {
     );
   }
 
-  Future<void> addVisit(String patientId, VisitEntity visit) async {
+  Future<Either<Failure, Unit>> addVisit(
+      String patientId, VisitEntity visit) async {
     state = state.copyWith(isLoading: true, failureOrSuccessOption: none());
     final repository = ref.read(patientRepositoryProvider);
     final result = await repository.addVisit(patientId, visit);
 
-    result.fold(
-      (failure) => state = state.copyWith(
-          isLoading: false, failureOrSuccessOption: some(failure)),
+    return result.fold(
+      (failure) {
+        state = state.copyWith(
+            isLoading: false, failureOrSuccessOption: some(failure));
+        return Left(failure);
+      },
       (_) async {
-        // Should we set success here?
-        // For add/update, we might want to show a snackbar.
-        // But we refresh the list immediately.
-        // Let's set success failureOrSuccessOption is for *failure*.
-        // If we want to signal success, we might need another field or use Option<Either<Failure, Unit>>.
-        // For now, let's just clear failure.
         await getVisits(patientId);
+        return const Right(unit);
       },
     );
   }
 
-  Future<void> updateVisit(String patientId, VisitEntity visit) async {
+  Future<Either<Failure, Unit>> updateVisit(
+      String patientId, VisitEntity visit) async {
     state = state.copyWith(isLoading: true, failureOrSuccessOption: none());
     final repository = ref.read(patientRepositoryProvider);
     final result = await repository.updateVisit(patientId, visit);
 
-    result.fold(
-      (failure) => state = state.copyWith(
-          isLoading: false, failureOrSuccessOption: some(failure)),
+    return result.fold(
+      (failure) {
+        state = state.copyWith(
+            isLoading: false, failureOrSuccessOption: some(failure));
+        return Left(failure);
+      },
       (_) async {
         await getVisits(patientId);
+        return const Right(unit);
       },
     );
   }

@@ -375,9 +375,72 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
                   const Divider(height: 1, indent: 56),
                   _buildContactTile(
                       Icons.work, 'Occupation', widget.patient.occupation),
+                  const Divider(height: 1, indent: 56),
+                  _buildContactTile(Icons.people, 'Marital Status',
+                      widget.patient.maritalStatus),
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 32),
+          _buildSectionHeader(
+              'Emergency Contact', Icons.emergency_share_outlined),
+          const SizedBox(height: 16),
+          Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+            ),
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                children: [
+                  _buildContactTile(Icons.person, 'Name',
+                      widget.patient.emergencyContactName),
+                  const Divider(height: 1, indent: 56),
+                  _buildContactTile(Icons.phone, 'Phone',
+                      widget.patient.emergencyContactPhone),
+                  const Divider(height: 1, indent: 56),
+                  _buildContactTile(Icons.link, 'Relationship',
+                      widget.patient.emergencyContactRelationship),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+          _buildSectionHeader('Medical History', Icons.history_edu_outlined),
+          const SizedBox(height: 16),
+          _buildInfoBlock('Family Medical History',
+              widget.patient.familyMedicalHistory ?? 'None recorded'),
+          if (widget.patient.hasSurgicalHistory) ...[
+            const SizedBox(height: 16),
+            _buildInfoBlock('Surgical History',
+                widget.patient.surgeryDetails ?? 'Details not provided'),
+          ],
+          if (widget.patient.isTakingMedication) ...[
+            const SizedBox(height: 16),
+            _buildInfoBlock('Current Medications',
+                widget.patient.currentMedications ?? 'None recorded'),
+          ],
+          const SizedBox(height: 32),
+          _buildSectionHeader('Lifestyle', Icons.self_improvement_outlined),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: [
+              _buildLifestyleChip(
+                  'Smoking', widget.patient.smokingStatus, Icons.smoking_rooms),
+              _buildLifestyleChip('Alcohol', widget.patient.alcoholConsumption,
+                  Icons.local_drink),
+              _buildLifestyleChip('Activity',
+                  widget.patient.physicalActivityLevel, Icons.directions_run),
+              if (widget.patient.sleepHoursPerNight != null)
+                _buildLifestyleChip('Sleep',
+                    '${widget.patient.sleepHoursPerNight} hrs', Icons.bedtime),
+            ],
           ),
           if (widget.patient.drugAllergyDetails != null &&
               widget.patient.drugAllergyDetails!.isNotEmpty) ...[
@@ -445,6 +508,32 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
 
     if (visitState.isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    if (visitState.failureOrSuccessOption.isSome()) {
+      return visitState.failureOrSuccessOption.fold(
+        () => const SizedBox.shrink(),
+        (failure) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              Text('Error loading visits: ${failure.message}',
+                  style: const TextStyle(color: Colors.red)),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref
+                      .read(visitNotifierProvider.notifier)
+                      .getVisits(widget.patient.id);
+                },
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     if (visitState.visits.isEmpty) {
@@ -603,29 +692,34 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
                           spacing: 8,
                           runSpacing: 8,
                           children: visit.reports.map<Widget>((report) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: AppTheme.backgroundLight,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                    color: Colors.grey.withOpacity(0.2)),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.attach_file,
-                                      size: 16, color: AppTheme.textGrey),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    report.name,
-                                    style: const TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppTheme.textDark),
-                                  ),
-                                ],
+                            return InkWell(
+                              onTap: () => _launchUrl(report.fileUrl),
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.backgroundLight,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      color: Colors.grey.withOpacity(0.2)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.attach_file,
+                                        size: 16, color: AppTheme.textGrey),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      report.name,
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          decoration: TextDecoration.underline,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppTheme.primaryGreen),
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           }).toList(),
@@ -689,6 +783,64 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
     );
   }
 
+  Widget _buildInfoBlock(String title, String content) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title.toUpperCase(),
+              style: const TextStyle(
+                  color: AppTheme.textGrey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text(content,
+              style: const TextStyle(
+                  color: AppTheme.textDark, fontSize: 16, height: 1.5)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLifestyleChip(String label, String value, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: AppTheme.primaryGreen, size: 20),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  style:
+                      const TextStyle(fontSize: 10, color: AppTheme.textGrey)),
+              Text(value,
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textDark)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+// Existing _buildInfoCard method...
   Widget _buildInfoCard(
       String label, String value, IconData icon, Color color, double width) {
     return Container(

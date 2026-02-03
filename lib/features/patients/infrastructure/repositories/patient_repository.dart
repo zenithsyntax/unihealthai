@@ -83,7 +83,16 @@ class PatientRepository implements IPatientRepository {
       // Ensure the ID is set if it was empty
       final visitToSave = visitDto.copyWith(id: docRef.id);
 
-      await docRef.set(visitToSave.toJson());
+      final visitJson = visitToSave.toJson();
+      // Manually convert reports to list of maps because the generated toJson
+      // might not handle it if explicit_to_json is not enabled in generator
+      // and we cannot run build_runner easily.
+      if (visitToSave.reports.isNotEmpty) {
+        visitJson['reports'] =
+            visitToSave.reports.map((e) => e.toJson()).toList();
+      }
+
+      await docRef.set(visitJson);
 
       // Optional: Update patient's "last visit" or similar summary field if needed
       // But for now, we just add to subcollection.
@@ -99,13 +108,17 @@ class PatientRepository implements IPatientRepository {
       String patientId, VisitEntity visit) async {
     try {
       final visitDto = VisitDto.fromDomain(visit);
+      final visitJson = visitDto.toJson();
+      if (visitDto.reports.isNotEmpty) {
+        visitJson['reports'] = visitDto.reports.map((e) => e.toJson()).toList();
+      }
 
       await _firestore
           .collection('patients')
           .doc(patientId)
           .collection('visits')
           .doc(visit.id)
-          .update(visitDto.toJson());
+          .update(visitJson);
 
       return const Right(unit);
     } catch (e) {

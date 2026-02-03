@@ -118,8 +118,12 @@ class _AddEditVisitScreenState extends ConsumerState<AddEditVisitScreen> {
     }
   }
 
-  void _saveVisit() {
+  Future<void> _saveVisit() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isUploading = true;
+      });
+
       final visitId = widget.existingVisit?.id ?? const Uuid().v4();
       final visit = VisitEntity(
         id: visitId,
@@ -132,12 +136,26 @@ class _AddEditVisitScreenState extends ConsumerState<AddEditVisitScreen> {
       );
 
       final notifier = ref.read(visitNotifierProvider.notifier);
-      if (widget.existingVisit != null) {
-        notifier.updateVisit(widget.patientId, visit);
-      } else {
-        notifier.addVisit(widget.patientId, visit);
+      final result = widget.existingVisit != null
+          ? await notifier.updateVisit(widget.patientId, visit)
+          : await notifier.addVisit(widget.patientId, visit);
+
+      if (mounted) {
+        setState(() {
+          _isUploading = false;
+        });
+
+        result.fold(
+          (failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error saving visit: ${failure.message}')),
+            );
+          },
+          (_) {
+            Navigator.pop(context);
+          },
+        );
       }
-      Navigator.pop(context);
     }
   }
 

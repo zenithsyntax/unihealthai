@@ -67,7 +67,7 @@ class VisitChatNotifier extends Notifier<VisitChatState> {
       subscription.cancel();
     });
 
-    return VisitChatState(isLoading: true);
+    return VisitChatState(isLoading: false);
   }
 
   String _buildContextString(VisitEntity visit) {
@@ -122,43 +122,45 @@ ${reportsList.isEmpty ? 'None' : reportsList}
 
     state = state.copyWith(isLoading: true);
 
-    // 2. Call AI
-    // Prepend context to the user's message so the AI knows what we are talking about
-    String prompt = text;
-    if (_params.visit != null) {
-      prompt = '''
+    try {
+      // 2. Call AI
+      // Prepend context to the user's message so the AI knows what we are talking about
+      String prompt = text;
+      if (_params.visit != null) {
+        prompt = '''
 ${_buildContextString(_params.visit!)}
 
 User Query: $text
 ''';
+      }
+
+      // Get recent history (last 2 messages) to provide context
+      final history = state.messages.length > 2
+          ? state.messages
+              .sublist(state.messages.length - 2)
+              .map((e) => {'text': e.text, 'isUser': e.isUser})
+              .toList()
+          : state.messages
+              .map((e) => {'text': e.text, 'isUser': e.isUser})
+              .toList();
+
+      final response = await _repository.generateAIResponse(
+        prompt,
+        history: history,
+        reports: _params.visit?.reports,
+      );
+
+      // 3. Save AI Response
+      if (response != null) {
+        await _repository.saveMessage(
+            patientId: _params.patientId,
+            visitId: _params.visitId,
+            text: response,
+            isUser: false);
+      }
+    } finally {
+      state = state.copyWith(isLoading: false);
     }
-
-    // Get recent history (last 2 messages) to provide context
-    final history = state.messages.length > 2
-        ? state.messages
-            .sublist(state.messages.length - 2)
-            .map((e) => {'text': e.text, 'isUser': e.isUser})
-            .toList()
-        : state.messages
-            .map((e) => {'text': e.text, 'isUser': e.isUser})
-            .toList();
-
-    final response = await _repository.generateAIResponse(
-      prompt,
-      history: history,
-      reports: _params.visit?.reports,
-    );
-
-    // 3. Save AI Response
-    if (response != null) {
-      await _repository.saveMessage(
-          patientId: _params.patientId,
-          visitId: _params.visitId,
-          text: response,
-          isUser: false);
-    }
-
-    state = state.copyWith(isLoading: false);
   }
 }
 

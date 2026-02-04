@@ -34,7 +34,8 @@ class VisitChatState {
 typedef VisitChatParams = ({
   String patientId,
   String visitId,
-  VisitEntity? visit
+  VisitEntity? visit,
+  PatientEntity? patient,
 });
 
 final visitChatParamsProvider = Provider<VisitChatParams>((ref) {
@@ -58,7 +59,8 @@ class VisitChatNotifier extends Notifier<VisitChatState> {
 
       if (messages.isEmpty && _params.visit != null) {
         // Auto-send initial context if chat is empty and we have visit details
-        _initializeContext(_params.visit!, _params.patientId, _params.visitId);
+        _initializeContext(_params.visit!, _params.patientId, _params.visitId,
+            _params.patient);
       } else {
         state = state.copyWith(messages: messages);
       }
@@ -71,13 +73,25 @@ class VisitChatNotifier extends Notifier<VisitChatState> {
     return VisitChatState(isLoading: false);
   }
 
-  String _buildContextString(VisitEntity visit) {
+  String _buildContextString(VisitEntity visit, [PatientEntity? patient]) {
     final reportsList = visit.reports
         .map((r) => '- ${r.name} (Type: ${r.type}, Date: ${r.date})')
         .join('\n');
 
+    String patientContext = '';
+    if (patient != null) {
+      patientContext = '''
+[Patient Summary]
+Name: ${patient.name}
+Details: ${patient.age}y ${patient.gender}, ${patient.bloodType}
+Critical: ${patient.hasDiabetes ? 'Diabetes' : ''} ${patient.hasHeartCondition ? 'Heart Condition' : ''} ${patient.drugAllergyDetails != null ? 'Allergies: ${patient.drugAllergyDetails}' : ''}
+''';
+    }
+
     return '''
 Here is the context for this visit:
+
+$patientContext
 
 [Visit Details]
 Date: ${visit.date.toString()}
@@ -99,10 +113,10 @@ ${reportsList.isEmpty ? 'None' : reportsList}
 ''';
   }
 
-  Future<void> _initializeContext(
-      VisitEntity visit, String patientId, String visitId) async {
+  Future<void> _initializeContext(VisitEntity visit, String patientId,
+      String visitId, PatientEntity? patient) async {
     // Create context message
-    final contextMessage = _buildContextString(visit);
+    final contextMessage = _buildContextString(visit, patient);
     // Save as AI message (or system message, treating as non-user)
     await _repository.saveMessage(
         patientId: patientId,
@@ -137,7 +151,7 @@ ${reportsList.isEmpty ? 'None' : reportsList}
       String prompt = text;
       if (_params.visit != null) {
         prompt = '''
-${_buildContextString(_params.visit!)}
+${_buildContextString(_params.visit!, _params.patient)}
 
 User Query: $text
 ''';

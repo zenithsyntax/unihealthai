@@ -11,11 +11,13 @@ import '../../domain/entities/chat_message.dart';
 class VisitChatScreen extends ConsumerStatefulWidget {
   final String patientId;
   final VisitEntity visit;
+  final PatientEntity patient;
 
   const VisitChatScreen({
     super.key,
     required this.patientId,
     required this.visit,
+    required this.patient,
   });
 
   @override
@@ -31,6 +33,7 @@ class _VisitChatScreenState extends ConsumerState<VisitChatScreen> {
           patientId: widget.patientId,
           visitId: widget.visit.id,
           visit: widget.visit,
+          patient: widget.patient,
         )),
         visitChatNotifierProvider.overrideWith(() => VisitChatNotifier()),
       ],
@@ -55,12 +58,215 @@ class _VisitChatContentState extends ConsumerState<_VisitChatContent> {
   final List<({Uint8List bytes, String name, String mimeType})> _selectedFiles =
       [];
 
+  // Mention State
+  OverlayEntry? _overlayEntry;
+  final LayerLink _layerLink = LayerLink();
+  List<String> _filteredMentions = [];
+  String? _currentMentionFilter;
+  int _mentionStartIndex = -1;
+
+  final Map<String, String Function(PatientEntity)> _mentionOptions = {
+    // 🧍 Personal / Demographics
+    'First Name': (p) => p.firstName,
+    'Last Name': (p) => p.lastName,
+    'Full Name': (p) => p.name,
+    'Gender': (p) => p.gender,
+    'DOB': (p) => p.dateOfBirth.toString().split(' ')[0],
+    'Age': (p) => '${p.age} years',
+    'Nationality': (p) => p.nationality,
+    'Marital Status': (p) => p.maritalStatus,
+    'Occupation': (p) => p.occupation,
+    // 📞 Contact / Emergency
+    'Contact Number': (p) => p.contactNumber,
+    'Emergency Contact Name': (p) => p.emergencyContactName,
+    'Emergency Contact Phone': (p) => p.emergencyContactPhone,
+    'Emergency Relationship': (p) => p.emergencyContactRelationship,
+    // 🏥 Medical History
+    'Blood Type': (p) => p.bloodType,
+    'Heart Condition': (p) => p.hasHeartCondition ? 'Yes' : 'No',
+    'Diabetes': (p) => p.hasDiabetes ? 'Yes' : 'No',
+    'Asthma': (p) => p.hasAsthma ? 'Yes' : 'No',
+    'High Blood Pressure': (p) => p.hasHighBloodPressure ? 'Yes' : 'No',
+    'Surgical History': (p) => p.hasSurgicalHistory ? 'Yes' : 'No',
+    'Surgery Details': (p) => p.surgeryDetails ?? 'None',
+    'Family History': (p) => p.familyMedicalHistory ?? 'None',
+    // 💊 Medications & Allergies
+    'Taking Medication': (p) => p.isTakingMedication ? 'Yes' : 'No',
+    'Current Medications': (p) => p.currentMedications ?? 'None',
+    'Drug Allergies': (p) => p.drugAllergyDetails ?? 'None',
+    'Food Allergies': (p) => p.foodAllergyDetails ?? 'None',
+    // 🧠 Mental & Lifestyle
+    'Mental Health Notes': (p) => p.mentalHealthNotes ?? 'None',
+    'Smoking Status': (p) => p.smokingStatus,
+    'Alcohol Consumption': (p) => p.alcoholConsumption,
+    'Activity Level': (p) => p.physicalActivityLevel,
+    'Sleep Hours': (p) => '${p.sleepHoursPerNight ?? 'Unknown'} hours',
+    // 📏 Body Metrics / Vitals
+    'Height': (p) => '${p.height} cm',
+    'Weight': (p) => '${p.weight} kg',
+    'BMI': (p) => p.bmi?.toStringAsFixed(1) ?? 'N/A',
+    'Resting Heart Rate': (p) => '${p.restingHeartRate ?? 'N/A'} bpm',
+    'Blood Pressure': (p) => p.bloodPressure ?? 'N/A',
+    // 📄 Administrative / Consent
+    'Insurance Provider': (p) => p.insuranceProvider ?? 'None',
+    'Policy Number': (p) => p.insurancePolicyNumber ?? 'None',
+    'Consent Given': (p) => p.consentToTreatment ? 'Yes' : 'No',
+    'Consent Date': (p) => p.consentDate?.toString().split(' ')[0] ?? 'N/A',
+    'Notes': (p) => p.notes ?? 'None',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_onTextChanged);
+  }
+
   @override
   void dispose() {
+    _removeOverlay();
+    _controller.removeListener(_onTextChanged);
     _controller.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onTextChanged() {
+    final text = _controller.text;
+    final selection = _controller.selection;
+
+    if (!selection.isValid || selection.baseOffset < 0) {
+      _removeOverlay();
+      return;
+    }
+
+    // Find if we are typing a mention
+    final cursorPos = selection.baseOffset;
+    final textBeforeCursor = text.substring(0, cursorPos);
+    final lastAtPos = textBeforeCursor.lastIndexOf('@');
+
+    if (lastAtPos != -1) {
+      // Check if there is a space before @ or it's the start of text
+      bool isValidStart = lastAtPos == 0 || text[lastAtPos - 1] == ' ';
+
+      if (isValidStart) {
+        final filter = text.substring(lastAtPos + 1, cursorPos);
+        // Ensure no spaces in the filter for now (simple mentions)
+        if (!filter.contains(' ')) {
+          _currentMentionFilter = filter;
+          _mentionStartIndex = lastAtPos;
+          _showMentionsOverlay();
+          return;
+        }
+      }
+    }
+
+    _removeOverlay();
+  }
+
+  void _showMentionsOverlay() {
+    final params = ref.read(visitChatParamsProvider);
+    final patient = params.patient;
+    if (patient == null) return;
+
+    setState(() {
+      _filteredMentions = _mentionOptions.keys
+          .where((key) =>
+              key.toLowerCase().contains(_currentMentionFilter!.toLowerCase()))
+          .toList();
+    });
+
+    if (_filteredMentions.isEmpty) {
+      _removeOverlay();
+      return;
+    }
+
+    if (_overlayEntry == null) {
+      _overlayEntry = _createOverlayEntry();
+      Overlay.of(context).insert(_overlayEntry!);
+    } else {
+      _overlayEntry!.markNeedsBuild();
+    }
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _currentMentionFilter = null;
+    _mentionStartIndex = -1;
+  }
+
+  void _insertMention(String key) {
+    if (_mentionStartIndex == -1 || _currentMentionFilter == null) return;
+
+    final params = ref.read(visitChatParamsProvider);
+    final patient = params.patient;
+    if (patient == null) return;
+
+    final value = _mentionOptions[key]!(patient);
+    final text = _controller.text;
+    final afterCursor = text.substring(_controller.selection.baseOffset);
+
+    // Replace @filter with value
+    final newText = text.substring(0, _mentionStartIndex) +
+        value +
+        ' ' + // Add space after mention
+        afterCursor;
+
+    _controller.text = newText;
+    _controller.selection =
+        TextSelection.collapsed(offset: _mentionStartIndex + value.length + 1);
+
+    _removeOverlay();
+    _focusNode.requestFocus();
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        width: 250,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          showWhenUnlinked: false,
+          offset: const Offset(0, -200), // Show above
+          child: Material(
+            elevation: 8,
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 200),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: _filteredMentions.length,
+                itemBuilder: (context, index) {
+                  final key = _filteredMentions[index];
+                  // Safe to read here because we check for patient nullity before showing overlay
+                  final params = ref.read(visitChatParamsProvider);
+                  final patient = params.patient!;
+                  final value = _mentionOptions[key]!(patient);
+
+                  return ListTile(
+                    dense: true,
+                    leading: const Icon(Icons.person_outline,
+                        size: 18, color: Color(0xFF3B82F6)),
+                    title: Text(key,
+                        style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                    subtitle: Text(value,
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                    onTap: () => _insertMention(key),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _pickFile() async {
@@ -329,36 +535,39 @@ class _VisitChatContentState extends ConsumerState<_VisitChatContent> {
                   tooltip: 'Attach file',
                 ),
                 Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: TextField(
-                      controller: _controller,
-                      focusNode: _focusNode,
-                      maxLines: 5,
-                      minLines: 1,
-                      textCapitalization: TextCapitalization.sentences,
-                      enabled: !isLoading,
-                      style: GoogleFonts.inter(
-                        fontSize: 15,
-                        color: const Color(0xFF1E293B),
-                        height: 1.5,
+                  child: CompositedTransformTarget(
+                    link: _layerLink,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
                       ),
-                      decoration: InputDecoration(
-                        hintText: 'Ask a question...',
-                        hintStyle: GoogleFonts.inter(
-                          color: const Color(0xFF94A3B8),
+                      child: TextField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        maxLines: 5,
+                        minLines: 1,
+                        textCapitalization: TextCapitalization.sentences,
+                        enabled: !isLoading,
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          color: const Color(0xFF1E293B),
+                          height: 1.5,
                         ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
+                        decoration: InputDecoration(
+                          hintText: 'Ask a question...',
+                          hintStyle: GoogleFonts.inter(
+                            color: const Color(0xFF94A3B8),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
                         ),
+                        onSubmitted: (_) => _sendMessage(ref),
                       ),
-                      onSubmitted: (_) => _sendMessage(ref),
                     ),
                   ),
                 ),

@@ -678,6 +678,7 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
                                   builder: (context) => VisitChatScreen(
                                     patientId: widget.patient.id,
                                     visit: visit,
+                                    patient: widget.patient,
                                   ),
                                 ),
                               );

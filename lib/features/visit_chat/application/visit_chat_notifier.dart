@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -110,15 +111,23 @@ ${reportsList.isEmpty ? 'None' : reportsList}
         isUser: false);
   }
 
-  Future<void> sendMessage(String text) async {
+  Future<void> sendMessage(String text,
+      {List<({Uint8List bytes, String mimeType, String name})>?
+          attachments}) async {
     if (text.isEmpty) return;
 
     // 1. Save User Message
     await _repository.saveMessage(
-        patientId: _params.patientId,
-        visitId: _params.visitId,
-        text: text,
-        isUser: true);
+      patientId: _params.patientId,
+      visitId: _params.visitId,
+      text: text,
+      isUser: true,
+      attachments: attachments
+              ?.map((e) => ChatAttachment(
+                  name: e.name, mimeType: e.mimeType, url: null)) // No URL yet
+              .toList() ??
+          [],
+    );
 
     state = state.copyWith(isLoading: true);
 
@@ -148,6 +157,7 @@ User Query: $text
         prompt,
         history: history,
         reports: _params.visit?.reports,
+        attachments: attachments,
       );
 
       // 3. Save AI Response

@@ -1,7 +1,9 @@
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import '../../domain/entities/chat_message.dart';
 
 class VisitChatRepository {
   final FirebaseFirestore _firestore;
@@ -27,23 +29,35 @@ class VisitChatRepository {
     required String visitId,
     required String text,
     required bool isUser,
+    List<ChatAttachment> attachments = const [],
   }) async {
+    final data = {
+      'text': text,
+      'isUser': isUser,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    if (attachments.isNotEmpty) {
+      data['attachments'] = attachments.map((e) => e.toMap()).toList();
+    }
+
     await _firestore
         .collection('patients')
         .doc(patientId)
         .collection('visits')
         .doc(visitId)
         .collection('chat')
-        .add({
-      'text': text,
-      'isUser': isUser,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
+        .add(data);
     print('Message saved to Firestore'); // Debug log
   }
 
-  Future<String?> generateAIResponse(String message,
-      {List<Map<String, dynamic>>? history, List<dynamic>? reports}) async {
+  Future<String?> generateAIResponse(
+    String message, {
+    List<Map<String, dynamic>>? history,
+    List<dynamic>? reports,
+    // Optional local attachment
+    List<({Uint8List bytes, String mimeType, String name})>? attachments,
+  }) async {
     try {
       // Using gemini-2.0-flash as 1.5 is retired
       final model =
@@ -93,7 +107,15 @@ class VisitChatRepository {
         }
       }
 
-      // 3. Add Current Message
+      // 3. Add Local Attachments
+      if (attachments != null) {
+        for (final file in attachments) {
+          parts.add(InlineDataPart(file.mimeType, file.bytes));
+          parts.add(TextPart('Attached File: ${file.name}'));
+        }
+      }
+
+      // 4. Add Current Message
       parts.add(TextPart(message));
 
       final content = [Content.multi(parts)];

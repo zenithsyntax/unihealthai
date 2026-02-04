@@ -70,17 +70,38 @@ class VisitChatNotifier extends Notifier<VisitChatState> {
     return VisitChatState(isLoading: true);
   }
 
+  String _buildContextString(VisitEntity visit) {
+    final reportsList = visit.reports
+        .map((r) => '- ${r.name} (Type: ${r.type}, Date: ${r.date})')
+        .join('\n');
+
+    return '''
+Here is the context for this visit:
+
+[Visit Details]
+Date: ${visit.date.toString()}
+
+[Diagnosis]
+${visit.diagnosis}
+
+[Assessment]
+${visit.assessment}
+
+[Prescription]
+${visit.prescription}
+
+[Manual Notes]
+${visit.notes != null && visit.notes!.isNotEmpty ? visit.notes : 'None'}
+
+[Attached Medical Reports]
+${reportsList.isEmpty ? 'None' : reportsList}
+''';
+  }
+
   Future<void> _initializeContext(
       VisitEntity visit, String patientId, String visitId) async {
     // Create context message
-    final contextMessage = '''
-Here is the context for this visit:
-Date: ${visit.date.toString()}
-Diagnosis: ${visit.diagnosis}
-Assessment: ${visit.assessment}
-Prescription: ${visit.prescription}
-Notes: ${visit.notes ?? 'None'}
-''';
+    final contextMessage = _buildContextString(visit);
     // Save as AI message (or system message, treating as non-user)
     await _repository.saveMessage(
         patientId: patientId,
@@ -102,7 +123,31 @@ Notes: ${visit.notes ?? 'None'}
     state = state.copyWith(isLoading: true);
 
     // 2. Call AI
-    final response = await _repository.generateAIResponse(text);
+    // Prepend context to the user's message so the AI knows what we are talking about
+    String prompt = text;
+    if (_params.visit != null) {
+      prompt = '''
+${_buildContextString(_params.visit!)}
+
+User Query: $text
+''';
+    }
+
+    // Get recent history (last 2 messages) to provide context
+    final history = state.messages.length > 2
+        ? state.messages
+            .sublist(state.messages.length - 2)
+            .map((e) => {'text': e.text, 'isUser': e.isUser})
+            .toList()
+        : state.messages
+            .map((e) => {'text': e.text, 'isUser': e.isUser})
+            .toList();
+
+    final response = await _repository.generateAIResponse(
+      prompt,
+      history: history,
+      reports: _params.visit?.reports,
+    );
 
     // 3. Save AI Response
     if (response != null) {

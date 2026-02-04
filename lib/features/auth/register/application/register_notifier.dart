@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../domain/repositories/register_repository.dart';
 import 'register_state.dart';
 import '../../../../core/di/dependency_injection.dart';
 

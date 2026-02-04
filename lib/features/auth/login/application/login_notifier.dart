@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/di/dependency_injection.dart';
-import '../domain/repositories/login_repository.dart';
 import 'login_state.dart';
 
 final loginNotifierProvider =

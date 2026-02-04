@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 class VisitChatRepository {
   final FirebaseFirestore _firestore;
@@ -38,21 +39,65 @@ class VisitChatRepository {
       'isUser': isUser,
       'timestamp': FieldValue.serverTimestamp(),
     });
+    print('Message saved to Firestore'); // Debug log
   }
 
   Future<String?> generateAIResponse(String message,
-      {List<Map<String, dynamic>>? history}) async {
+      {List<Map<String, dynamic>>? history, List<dynamic>? reports}) async {
     try {
+      // Using gemini-2.0-flash as 1.5 is retired
       final model =
-          FirebaseAI.vertexAI().generativeModel(model: 'gemini-2.5-flash');
+          FirebaseAI.vertexAI().generativeModel(model: 'gemini-2.0-flash');
 
-      // Convert history to Content objects if needed, for now just sending the new message or simple context
-      // Robust implementation would convert the full history.
-      // For this step, let's just send the text.
-      // TODO: Improve context handling if expanding.
+      final parts = <Part>[];
 
-      final prompt = [Content.text(message)];
-      final response = await model.generateContent(prompt);
+      // 1. Add History (Context)
+      if (history != null && history.isNotEmpty) {
+        final historyText = history.map((msg) {
+          final role = msg['isUser'] == true ? 'User' : 'AI';
+          return '$role: ${msg['text']}';
+        }).join('\n');
+        parts.add(TextPart('Previous Chat History:\n$historyText\n'));
+      }
+
+      // 2. Add Medical Reports (Download and attach)
+      if (reports != null && reports.isNotEmpty) {
+        for (var report in reports) {
+          try {
+            final url = report.fileUrl as String;
+            final name = report.name as String;
+
+            String mimeType = 'application/octet-stream';
+            if (url.contains('.pdf')) {
+              mimeType = 'application/pdf';
+            } else if (url.contains('.jpg') || url.contains('.jpeg')) {
+              mimeType = 'image/jpeg';
+            } else if (url.contains('.png')) {
+              mimeType = 'image/png';
+            }
+
+            final response = await http.get(Uri.parse(url));
+            if (response.statusCode == 200) {
+              // Try InlineDataPart for FirebaseAI / VertexAI
+              // Note: If InlineDataPart is not found, we might need DataPart or BlobPart
+              // But standard firebase_vertexai uses InlineDataPart
+              parts.add(InlineDataPart(mimeType, response.bodyBytes));
+              parts.add(TextPart('Attached File: $name'));
+            } else {
+              parts.add(TextPart('Failed to download report: $name'));
+            }
+          } catch (e) {
+            print('Error downloading report: $e');
+            parts.add(TextPart('Error reading report: ${report.name}'));
+          }
+        }
+      }
+
+      // 3. Add Current Message
+      parts.add(TextPart(message));
+
+      final content = [Content.multi(parts)];
+      final response = await model.generateContent(content);
       return response.text;
     } catch (e) {
       return "Error generating response: $e";

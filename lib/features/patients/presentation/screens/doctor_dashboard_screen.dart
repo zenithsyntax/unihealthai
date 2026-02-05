@@ -62,7 +62,6 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                   children: [
                     _buildWelcomeSection(),
                     const SizedBox(height: 24),
-                   
                     _buildSectionHeader('My Patients'),
                     const SizedBox(height: 16),
                     _buildSearchField(),
@@ -122,30 +121,32 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
         ],
       ),
       actions: [
-        Stack(
-          children: [
-           
-            Positioned(
-              right: 12,
-              top: 12,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: AppTheme.errorRed,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(width: 8),
         Padding(
           padding: const EdgeInsets.only(right: 16.0),
           child: IconButton(
             icon: const Icon(Icons.logout_rounded, color: AppTheme.errorRed),
-            onPressed: () async {
-              await ref.read(firebaseAuthProvider).signOut();
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Logout'),
+                  content: const Text('Are you sure you want to logout?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        await ref.read(firebaseAuthProvider).signOut();
+                      },
+                      child: const Text('Logout',
+                          style: TextStyle(color: AppTheme.errorRed)),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         )
@@ -185,32 +186,9 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
             ),
           ],
         ),
-        Container(
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 3),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
-              ),
-            ],
-            image: const DecorationImage(
-              image: NetworkImage(
-                  'https://i.pravatar.cc/300?img=11'), // Mock avatar
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
       ],
     );
   }
-
-
 
   Widget _buildStatCard({
     required String title,
@@ -658,19 +636,6 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                   ),
                   const SizedBox(width: 8),
                   Container(width: 1, height: 30, color: Colors.grey[300]),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: () {
-                      // Mock call action
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Calling ${patient.name}...')));
-                    },
-                    icon: const Icon(Icons.call, color: AppTheme.primaryGreen),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.all(8),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -705,9 +670,7 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                   children: [
                     OutlinedButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Update feature coming soon')));
+                        context.push('/add-patient', extra: patient);
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppTheme.primaryGreen,

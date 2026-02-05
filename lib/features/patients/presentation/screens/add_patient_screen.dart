@@ -6,7 +6,9 @@ import '../../application/patient_notifier.dart';
 import '../../domain/entities/patient_entity.dart';
 
 class AddPatientScreen extends ConsumerStatefulWidget {
-  const AddPatientScreen({super.key});
+  final PatientEntity? patientToEdit;
+
+  const AddPatientScreen({super.key, this.patientToEdit});
 
   @override
   ConsumerState<AddPatientScreen> createState() => _AddPatientScreenState();
@@ -60,6 +62,46 @@ class _AddPatientScreenState extends ConsumerState<AddPatientScreen> {
   final _bloodPressureController = TextEditingController();
 
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.patientToEdit != null) {
+      final p = widget.patientToEdit!;
+      _firstNameController.text = p.firstName;
+      _lastNameController.text = p.lastName;
+      _selectedGender = p.gender;
+      _dateOfBirth = p.dateOfBirth;
+      _nationalityController.text = p.nationality;
+      _maritalStatus = p.maritalStatus;
+      _occupationController.text = p.occupation;
+      _contactController.text = p.contactNumber;
+      _emergencyNameController.text = p.emergencyContactName;
+      _emergencyPhoneController.text = p.emergencyContactPhone;
+      _emergencyRelationController.text = p.emergencyContactRelationship;
+      _bloodType = p.bloodType;
+      _hasHeartCondition = p.hasHeartCondition;
+      _hasDiabetes = p.hasDiabetes;
+      _hasAsthma = p.hasAsthma;
+      _hasHighBloodPressure = p.hasHighBloodPressure;
+      _hasSurgicalHistory = p.hasSurgicalHistory;
+      _surgeryDetailsController.text = p.surgeryDetails ?? '';
+      _familyHistoryController.text = p.familyMedicalHistory ?? '';
+      _isTakingMedication = p.isTakingMedication;
+      _currentMedicationsController.text = p.currentMedications ?? '';
+      _drugAllergiesController.text = p.drugAllergyDetails ?? '';
+      _foodAllergiesController.text = p.foodAllergyDetails ?? '';
+      _mentalHealthNotesController.text = p.mentalHealthNotes ?? '';
+      _smokingStatus = p.smokingStatus;
+      _alcoholConsumption = p.alcoholConsumption;
+      _physicalActivityLevel = p.physicalActivityLevel;
+      _sleepHoursController.text = p.sleepHoursPerNight?.toString() ?? '';
+      _heightController.text = p.height > 0 ? p.height.toString() : '';
+      _weightController.text = p.weight > 0 ? p.weight.toString() : '';
+      _restingHeartRateController.text = p.restingHeartRate?.toString() ?? '';
+      _bloodPressureController.text = p.bloodPressure ?? '';
+    }
+  }
 
   @override
   void dispose() {
@@ -133,7 +175,7 @@ class _AddPatientScreenState extends ConsumerState<AddPatientScreen> {
         }
 
         final newPatient = PatientEntity(
-          id: '',
+          id: widget.patientToEdit?.id ?? '',
           doctorId: currentUser.uid,
           firstName: _firstNameController.text.trim(),
           lastName: _lastNameController.text.trim(),
@@ -170,22 +212,32 @@ class _AddPatientScreenState extends ConsumerState<AddPatientScreen> {
           restingHeartRate:
               int.tryParse(_restingHeartRateController.text.trim()),
           bloodPressure: _bloodPressureController.text.trim(),
-          insuranceProvider: null,
-          insurancePolicyNumber: null,
-          consentToTreatment: false,
-          consentDate: null,
-          notes: null,
-          createdAt: DateTime.now(),
+          insuranceProvider: widget.patientToEdit?.insuranceProvider,
+          insurancePolicyNumber: widget.patientToEdit?.insurancePolicyNumber,
+          consentToTreatment: widget.patientToEdit?.consentToTreatment ?? false,
+          consentDate: widget.patientToEdit?.consentDate,
+          notes: widget.patientToEdit?.notes,
+          createdAt: widget.patientToEdit?.createdAt ?? DateTime.now(),
           updatedAt: DateTime.now(),
-          visits: [],
+          visits: widget.patientToEdit?.visits ?? [],
         );
 
-        await ref.read(patientNotifierProvider.notifier).addPatient(newPatient);
+        if (widget.patientToEdit != null) {
+          await ref
+              .read(patientNotifierProvider.notifier)
+              .updatePatient(newPatient);
+        } else {
+          await ref
+              .read(patientNotifierProvider.notifier)
+              .addPatient(newPatient);
+        }
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Patient added successfully!'),
+              content: Text(widget.patientToEdit != null
+                  ? 'Patient profile updated successfully!'
+                  : 'Patient added successfully!'),
               backgroundColor: Colors.green.shade700,
               behavior: SnackBarBehavior.floating,
             ),
@@ -196,7 +248,8 @@ class _AddPatientScreenState extends ConsumerState<AddPatientScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error adding patient: $e'),
+              content: Text(
+                  'Error ${widget.patientToEdit != null ? 'updating' : 'adding'} patient: $e'),
               backgroundColor: Colors.red.shade700,
               behavior: SnackBarBehavior.floating,
             ),
@@ -217,7 +270,9 @@ class _AddPatientScreenState extends ConsumerState<AddPatientScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: const Text('New Patient Profile'),
+        title: Text(widget.patientToEdit != null
+            ? 'Edit Patient Profile'
+            : 'New Patient Profile'),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -613,8 +668,11 @@ class _AddPatientScreenState extends ConsumerState<AddPatientScreen> {
                             child: CircularProgressIndicator(
                                 color: Colors.white, strokeWidth: 2),
                           )
-                        : const Text('Save Patient Profile',
-                            style: TextStyle(
+                        : Text(
+                            widget.patientToEdit != null
+                                ? 'Update Patient Profile'
+                                : 'Save Patient Profile',
+                            style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),

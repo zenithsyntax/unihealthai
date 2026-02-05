@@ -33,6 +33,25 @@ class PatientNotifier extends Notifier<PatientState> {
     });
   }
 
+  Future<void> updatePatient(PatientEntity patient) async {
+    final repository = ref.read(patientRepositoryProvider);
+    final result = await repository.updatePatient(patient);
+
+    result.fold(
+      (failure) => state = PatientState.failure(failure),
+      (unit) {
+        state.maybeWhen(
+          success: (patients) {
+            final updatedList =
+                patients.map((p) => p.id == patient.id ? patient : p).toList();
+            state = PatientState.success(updatedList);
+          },
+          orElse: () => getPatients(patient.doctorId),
+        );
+      },
+    );
+  }
+
   Future<void> deletePatient(String patientId) async {
     final repository = ref.read(patientRepositoryProvider);
     final result = await repository.deletePatient(patientId);

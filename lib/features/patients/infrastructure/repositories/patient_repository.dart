@@ -177,6 +177,20 @@ class PatientRepository implements IPatientRepository {
   }
 
   @override
+  Future<Either<Failure, Unit>> updatePatient(PatientEntity patient) async {
+    try {
+      final patientDto = PatientDto.fromDomain(patient);
+      await _firestore
+          .collection('patients')
+          .doc(patient.id)
+          .update(patientDto.toJson());
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> deletePatient(String patientId) async {
     try {
       await _firestore.collection('patients').doc(patientId).delete();

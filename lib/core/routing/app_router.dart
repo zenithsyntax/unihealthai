@@ -61,7 +61,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/add-patient',
-            builder: (context, state) => const AddPatientScreen(),
+            builder: (context, state) {
+              final patient = state.extra as PatientEntity?;
+              return AddPatientScreen(patientToEdit: patient);
+            },
           ),
         ],
       ),

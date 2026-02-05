@@ -27,9 +27,29 @@ class PatientNotifier extends Notifier<PatientState> {
     result.fold((l) {
       // Handle error, maybe set state to failure or just log
       // For now, sticking to simple logic
+      state = PatientState.failure(l);
     }, (r) {
       getPatients(patient.doctorId);
     });
+  }
+
+  Future<void> deletePatient(String patientId) async {
+    final repository = ref.read(patientRepositoryProvider);
+    final result = await repository.deletePatient(patientId);
+
+    result.fold(
+      (failure) => state = PatientState.failure(failure),
+      (unit) {
+        state.maybeWhen(
+          success: (patients) {
+            final updatedList =
+                patients.where((p) => p.id != patientId).toList();
+            state = PatientState.success(updatedList);
+          },
+          orElse: () {},
+        );
+      },
+    );
   }
 }
 

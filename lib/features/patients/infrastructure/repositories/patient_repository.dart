@@ -27,7 +27,30 @@ class PatientRepository implements IPatientRepository {
           .map((doc) => PatientDto.fromFirestore(doc).toDomain())
           .toList();
 
-      return Right(patients);
+      final patientsWithVisits =
+          await Future.wait(patients.map((patient) async {
+        try {
+          final visitsSnapshot = await _firestore
+              .collection('patients')
+              .doc(patient.id)
+              .collection('visits')
+              .orderBy('date', descending: true)
+              .limit(1)
+              .get();
+
+          if (visitsSnapshot.docs.isNotEmpty) {
+            final latestVisit =
+                VisitDto.fromFirestore(visitsSnapshot.docs.first).toDomain();
+            return patient.copyWith(visits: [latestVisit]);
+          }
+        } catch (e) {
+          // Ignore visit fetch errors to avoid blocking patient list
+          print('Error fetching visits for ${patient.id}: $e');
+        }
+        return patient;
+      }));
+
+      return Right(patientsWithVisits);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -148,6 +171,16 @@ class PatientRepository implements IPatientRepository {
       final uploadTask = await ref.putData(fileBytes, metadata);
       final url = await uploadTask.ref.getDownloadURL();
       return Right(url);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deletePatient(String patientId) async {
+    try {
+      await _firestore.collection('patients').doc(patientId).delete();
+      return const Right(unit);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

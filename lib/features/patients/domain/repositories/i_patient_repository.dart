@@ -12,4 +12,5 @@ abstract class IPatientRepository {
       String patientId, VisitEntity visit);
   Future<Either<Failure, String>> uploadMedicalReport(
       Uint8List fileBytes, String fileName, String patientId, String visitId);
+  Future<Either<Failure, Unit>> deletePatient(String patientId);
 }

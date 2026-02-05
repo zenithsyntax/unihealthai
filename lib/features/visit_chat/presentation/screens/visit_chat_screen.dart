@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 import '../../../patients/domain/entities/patient_entity.dart';
 import '../../application/visit_chat_notifier.dart';
 import '../../domain/entities/chat_message.dart';
@@ -65,55 +66,111 @@ class _VisitChatContentState extends ConsumerState<_VisitChatContent> {
   String? _currentMentionFilter;
   int _mentionStartIndex = -1;
 
-  final Map<String, String Function(PatientEntity)> _mentionOptions = {
-    // 🧍 Personal / Demographics
-    'First Name': (p) => p.firstName,
-    'Last Name': (p) => p.lastName,
-    'Full Name': (p) => p.name,
-    'Gender': (p) => p.gender,
-    'DOB': (p) => p.dateOfBirth.toString().split(' ')[0],
-    'Age': (p) => '${p.age} years',
-    'Nationality': (p) => p.nationality,
-    'Marital Status': (p) => p.maritalStatus,
-    'Occupation': (p) => p.occupation,
-    // 📞 Contact / Emergency
-    'Contact Number': (p) => p.contactNumber,
-    'Emergency Contact Name': (p) => p.emergencyContactName,
-    'Emergency Contact Phone': (p) => p.emergencyContactPhone,
-    'Emergency Relationship': (p) => p.emergencyContactRelationship,
-    // 🏥 Medical History
-    'Blood Type': (p) => p.bloodType,
-    'Heart Condition': (p) => p.hasHeartCondition ? 'Yes' : 'No',
-    'Diabetes': (p) => p.hasDiabetes ? 'Yes' : 'No',
-    'Asthma': (p) => p.hasAsthma ? 'Yes' : 'No',
-    'High Blood Pressure': (p) => p.hasHighBloodPressure ? 'Yes' : 'No',
-    'Surgical History': (p) => p.hasSurgicalHistory ? 'Yes' : 'No',
-    'Surgery Details': (p) => p.surgeryDetails ?? 'None',
-    'Family History': (p) => p.familyMedicalHistory ?? 'None',
-    // 💊 Medications & Allergies
-    'Taking Medication': (p) => p.isTakingMedication ? 'Yes' : 'No',
-    'Current Medications': (p) => p.currentMedications ?? 'None',
-    'Drug Allergies': (p) => p.drugAllergyDetails ?? 'None',
-    'Food Allergies': (p) => p.foodAllergyDetails ?? 'None',
-    // 🧠 Mental & Lifestyle
-    'Mental Health Notes': (p) => p.mentalHealthNotes ?? 'None',
-    'Smoking Status': (p) => p.smokingStatus,
-    'Alcohol Consumption': (p) => p.alcoholConsumption,
-    'Activity Level': (p) => p.physicalActivityLevel,
-    'Sleep Hours': (p) => '${p.sleepHoursPerNight ?? 'Unknown'} hours',
-    // 📏 Body Metrics / Vitals
-    'Height': (p) => '${p.height} cm',
-    'Weight': (p) => '${p.weight} kg',
-    'BMI': (p) => p.bmi?.toStringAsFixed(1) ?? 'N/A',
-    'Resting Heart Rate': (p) => '${p.restingHeartRate ?? 'N/A'} bpm',
-    'Blood Pressure': (p) => p.bloodPressure ?? 'N/A',
-    // 📄 Administrative / Consent
-    'Insurance Provider': (p) => p.insuranceProvider ?? 'None',
-    'Policy Number': (p) => p.insurancePolicyNumber ?? 'None',
-    'Consent Given': (p) => p.consentToTreatment ? 'Yes' : 'No',
-    'Consent Date': (p) => p.consentDate?.toString().split(' ')[0] ?? 'N/A',
-    'Notes': (p) => p.notes ?? 'None',
-  };
+  Map<String, String> _getMentionOptions(
+      PatientEntity p, List<VisitEntity> visits) {
+    final Map<String, String> options = {
+      // 🧍 Personal / Demographics
+      'first_name': p.firstName,
+      'last_name': p.lastName,
+      'full_name': p.name,
+      'gender': p.gender,
+      'dob': p.dateOfBirth.toString().split(' ')[0],
+      'age': '${p.age} years',
+      'nationality': p.nationality,
+      'marital_status': p.maritalStatus,
+      'occupation': p.occupation,
+      // 📞 Contact / Emergency
+      'contact_number': p.contactNumber,
+      'emergency_contact_name': p.emergencyContactName,
+      'emergency_contact_phone': p.emergencyContactPhone,
+      'emergency_relationship': p.emergencyContactRelationship,
+      // 🏥 Medical History
+      'blood_type': p.bloodType,
+      'heart_condition': p.hasHeartCondition ? 'Yes' : 'No',
+      'diabetes': p.hasDiabetes ? 'Yes' : 'No',
+      'asthma': p.hasAsthma ? 'Yes' : 'No',
+      'high_blood_pressure': p.hasHighBloodPressure ? 'Yes' : 'No',
+      'surgical_history': p.hasSurgicalHistory ? 'Yes' : 'No',
+      'surgery_details': p.surgeryDetails ?? 'None',
+      'family_history': p.familyMedicalHistory ?? 'None',
+      // 💊 Medications & Allergies
+      'taking_medication': p.isTakingMedication ? 'Yes' : 'No',
+      'current_medications': p.currentMedications ?? 'None',
+      'drug_allergies': p.drugAllergyDetails ?? 'None',
+      'food_allergies': p.foodAllergyDetails ?? 'None',
+      // 🧠 Mental & Lifestyle
+      'mental_health_notes': p.mentalHealthNotes ?? 'None',
+      'smoking_status': p.smokingStatus,
+      'alcohol_consumption': p.alcoholConsumption,
+      'activity_level': p.physicalActivityLevel,
+      'sleep_hours': '${p.sleepHoursPerNight ?? 'Unknown'} hours',
+      // 📏 Body Metrics / Vitals
+      'height': '${p.height} cm',
+      'weight': '${p.weight} kg',
+      'bmi': p.bmi?.toStringAsFixed(1) ?? 'N/A',
+      'resting_heart_rate': '${p.restingHeartRate ?? 'N/A'} bpm',
+      'blood_pressure': p.bloodPressure ?? 'N/A',
+      // 📄 Administrative / Consent
+      'insurance_provider': p.insuranceProvider ?? 'None',
+      'policy_number': p.insurancePolicyNumber ?? 'None',
+      'consent_given': p.consentToTreatment ? 'Yes' : 'No',
+      'consent_date': p.consentDate?.toString().split(' ')[0] ?? 'N/A',
+      'notes': p.notes ?? 'None',
+    };
+
+    // 🏥 Visit History
+    if (visits.isNotEmpty) {
+      // All Visits Summary
+      final allVisitsSummary = visits.map((v) {
+        final date = v.date.toString().split(' ')[0];
+        return 'Visit $date: ${v.diagnosis}';
+      }).join('\n');
+      options['visit_history'] = allVisitsSummary;
+
+      // Individual Visits
+      for (var visit in visits) {
+        final date = visit.date.toString().split(' ')[0];
+        final baseKey = 'visit_$date';
+
+        // 1. The "Folder" Entry
+        // Value ends in underscore to trigger drill-down mode, appending to the search
+        options[baseKey] = '${baseKey}_';
+
+        // 2. Full Visit Details (Import All)
+        String fullDetails = '''
+Date: $date
+Assessment: ${visit.assessment}
+Diagnosis: ${visit.diagnosis}
+Prescription: ${visit.prescription}
+Notes: ${visit.notes ?? 'None'}
+''';
+        if (visit.reports.isNotEmpty) {
+          fullDetails +=
+              'Reports: ${visit.reports.map((r) => r.name).join(", ")}\n';
+        }
+
+        options['${baseKey}_all'] = fullDetails.trim();
+
+        // 3. Specific Fields
+        options['${baseKey}_diagnosis'] = visit.diagnosis;
+        options['${baseKey}_assessment'] = visit.assessment;
+        options['${baseKey}_prescription'] = visit.prescription;
+        if (visit.notes != null && visit.notes!.isNotEmpty) {
+          options['${baseKey}_notes'] = visit.notes!;
+        }
+
+        // 4. Reports (Links)
+        if (visit.reports.isNotEmpty) {
+          final reportsSummary = visit.reports
+              .map((r) => '[${r.name}](${r.fileUrl})') // Markdown Link
+              .join('\n');
+          options['${baseKey}_reports'] = reportsSummary;
+        }
+      }
+    }
+
+    return options;
+  }
 
   @override
   void initState() {
@@ -167,10 +224,12 @@ class _VisitChatContentState extends ConsumerState<_VisitChatContent> {
   void _showMentionsOverlay() {
     final params = ref.read(visitChatParamsProvider);
     final patient = params.patient;
+    final chatState = ref.read(visitChatNotifierProvider);
     if (patient == null) return;
 
+    final options = _getMentionOptions(patient, chatState.historyVisits);
     setState(() {
-      _filteredMentions = _mentionOptions.keys
+      _filteredMentions = options.keys
           .where((key) =>
               key.toLowerCase().contains(_currentMentionFilter!.toLowerCase()))
           .toList();
@@ -201,24 +260,36 @@ class _VisitChatContentState extends ConsumerState<_VisitChatContent> {
 
     final params = ref.read(visitChatParamsProvider);
     final patient = params.patient;
+    final chatState = ref.read(visitChatNotifierProvider);
     if (patient == null) return;
 
-    final value = _mentionOptions[key]!(patient);
+    final options = _getMentionOptions(patient, chatState.historyVisits);
+    final value = options[key] ?? '';
     final text = _controller.text;
     final afterCursor = text.substring(_controller.selection.baseOffset);
+
+    // Check if it's a "Drill Down" (Folder)
+    // Value is suffix for filter, e.g. "visit_2026-02-02_"
+    final isDrillDown = value.endsWith('_') && value.startsWith('visit_');
 
     // Replace @filter with value
     final newText = text.substring(0, _mentionStartIndex) +
         value +
-        ' ' + // Add space after mention
+        (isDrillDown ? '' : ' ') + // Only add space if NOT drilling down
         afterCursor;
 
     _controller.text = newText;
-    _controller.selection =
-        TextSelection.collapsed(offset: _mentionStartIndex + value.length + 1);
+    _controller.selection = TextSelection.collapsed(
+        offset: _mentionStartIndex + value.length + (isDrillDown ? 0 : 1));
 
-    _removeOverlay();
-    _focusNode.requestFocus();
+    if (isDrillDown) {
+      // DRILL DOWN: Don't remove overlay.
+      // The text change triggered _onTextChanged listener which will update the filter to include the drill down suffix
+      // and call _showMentionsOverlay() to refresh the list with the sub-options.
+    } else {
+      _removeOverlay();
+      _focusNode.requestFocus();
+    }
   }
 
   OverlayEntry _createOverlayEntry() {
@@ -248,7 +319,10 @@ class _VisitChatContentState extends ConsumerState<_VisitChatContent> {
                   // Safe to read here because we check for patient nullity before showing overlay
                   final params = ref.read(visitChatParamsProvider);
                   final patient = params.patient!;
-                  final value = _mentionOptions[key]!(patient);
+                  final chatState = ref.read(visitChatNotifierProvider);
+                  final options =
+                      _getMentionOptions(patient, chatState.historyVisits);
+                  final value = options[key] ?? '';
 
                   return ListTile(
                     dense: true,
@@ -342,6 +416,13 @@ class _VisitChatContentState extends ConsumerState<_VisitChatContent> {
       if (next.messages.length > (previous?.messages.length ?? 0)) {
         Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
       }
+
+      // Update mentions if visits loaded while overlay is open
+      if (previous?.historyVisits.length != next.historyVisits.length &&
+          _overlayEntry != null &&
+          _currentMentionFilter != null) {
+        _showMentionsOverlay();
+      }
     });
 
     return Scaffold(
@@ -420,28 +501,30 @@ class _VisitChatContentState extends ConsumerState<_VisitChatContent> {
                       ],
                     ),
                   )
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 24),
-                    itemCount: chatState.messages.length +
-                        (chatState.isLoading ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index >= chatState.messages.length) {
-                        return const _TypingIndicator();
-                      }
+                : SelectionArea(
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 24),
+                      itemCount: chatState.messages.length +
+                          (chatState.isLoading ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index >= chatState.messages.length) {
+                          return const _TypingIndicator();
+                        }
 
-                      final message = chatState.messages[index];
-                      final isLastMessage =
-                          index == chatState.messages.length - 1;
+                        final message = chatState.messages[index];
+                        final isLastMessage =
+                            index == chatState.messages.length - 1;
 
-                      return _ChatMessageItem(
-                        message: message.text,
-                        isUser: message.isUser,
-                        isLast: isLastMessage,
-                        attachments: message.attachments,
-                      );
-                    },
+                        return _ChatMessageItem(
+                          message: message.text,
+                          isUser: message.isUser,
+                          isLast: isLastMessage,
+                          attachments: message.attachments,
+                        );
+                      },
+                    ),
                   ),
           ),
           _buildInputArea(context, ref, chatState.isLoading),
@@ -671,95 +754,142 @@ class _ChatMessageItem extends StatelessWidget {
                       isUser: isUser,
                     ),
                   ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: isUser ? const Color(0xFF3B82F6) : Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(20),
-                      topRight: const Radius.circular(20),
-                      bottomLeft:
-                          isUser ? const Radius.circular(20) : Radius.zero,
-                      bottomRight:
-                          isUser ? Radius.zero : const Radius.circular(20),
-                    ),
-                    boxShadow: isUser
-                        ? [
-                            BoxShadow(
-                              color: const Color(0xFF3B82F6)
-                                  .withValues(alpha: 0.2),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            )
-                          ]
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            )
-                          ],
-                  ),
-                  child: isUser
-                      ? Text(
-                          message,
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 15,
-                            height: 1.5,
-                          ),
-                        )
-                      : MarkdownBody(
-                          data: message,
-                          selectable: true,
-                          styleSheet: MarkdownStyleSheet(
-                            p: GoogleFonts.inter(
-                              fontSize: 15,
-                              height: 1.5,
-                              color: const Color(0xFF334155),
-                            ),
-                            h1: GoogleFonts.inter(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF1E293B),
-                            ),
-                            h2: GoogleFonts.inter(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF1E293B),
-                            ),
-                            h3: GoogleFonts.inter(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF1E293B),
-                            ),
-                            listBullet: const TextStyle(
-                              color: Color(0xFF64748B),
-                            ),
-                            strong: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF0F172A),
-                            ),
-                            code: GoogleFonts.firaCode(
-                              backgroundColor: const Color(0xFFF1F5F9),
-                              color: const Color(0xFF0F172A),
-                              fontSize: 13,
-                            ),
-                            blockquote: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontStyle: FontStyle.italic,
-                            ),
-                            blockquoteDecoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                  color: const Color(0xFFCBD5E1),
-                                  width: 4,
+                Stack(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                      decoration: BoxDecoration(
+                        color: isUser ? const Color(0xFF3B82F6) : Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(20),
+                          topRight: const Radius.circular(20),
+                          bottomLeft:
+                              isUser ? const Radius.circular(20) : Radius.zero,
+                          bottomRight:
+                              isUser ? Radius.zero : const Radius.circular(20),
+                        ),
+                        boxShadow: isUser
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFF3B82F6)
+                                      .withValues(alpha: 0.2),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                )
+                              ]
+                            : [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
+                                )
+                              ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          isUser
+                              ? Text(
+                                  message,
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    height: 1.5,
+                                  ),
+                                )
+                              : MarkdownBody(
+                                  data: message,
+                                  selectable: false,
+                                  styleSheet: MarkdownStyleSheet(
+                                    p: GoogleFonts.inter(
+                                      fontSize: 15,
+                                      height: 1.5,
+                                      color: const Color(0xFF334155),
+                                    ),
+                                    h1: GoogleFonts.inter(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF1E293B),
+                                    ),
+                                    h2: GoogleFonts.inter(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF1E293B),
+                                    ),
+                                    h3: GoogleFonts.inter(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF1E293B),
+                                    ),
+                                    listBullet: const TextStyle(
+                                      color: Color(0xFF64748B),
+                                    ),
+                                    strong: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                    code: GoogleFonts.firaCode(
+                                      backgroundColor: const Color(0xFFF1F5F9),
+                                      color: const Color(0xFF0F172A),
+                                      fontSize: 13,
+                                    ),
+                                    blockquote: const TextStyle(
+                                      color: Color(0xFF64748B),
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                    blockquoteDecoration: BoxDecoration(
+                                      border: Border(
+                                        left: BorderSide(
+                                          color: const Color(0xFFCBD5E1),
+                                          width: 4,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
+                        ],
+                      ),
+                    ),
+                    if (!isUser)
+                      Positioned(
+                        bottom: 4,
+                        right: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
                               ),
+                            ],
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.copy_rounded,
+                                size: 14, color: Color(0xFF64748B)),
+                            constraints: const BoxConstraints(
+                              minWidth: 28,
+                              minHeight: 28,
                             ),
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: message));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Message copied to clipboard'),
+                                  behavior: SnackBarBehavior.floating,
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            tooltip: 'Copy message',
                           ),
                         ),
+                      ),
+                  ],
                 ),
               ],
             ),

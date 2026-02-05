@@ -11,22 +11,26 @@ class VisitChatState {
   final List<ChatMessage> messages;
   final bool isLoading;
   final String? error;
+  final List<VisitEntity> historyVisits;
 
   VisitChatState({
     this.messages = const [],
     this.isLoading = false,
     this.error,
+    this.historyVisits = const [],
   });
 
   VisitChatState copyWith({
     List<ChatMessage>? messages,
     bool? isLoading,
     String? error,
+    List<VisitEntity>? historyVisits,
   }) {
     return VisitChatState(
       messages: messages ?? this.messages,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      historyVisits: historyVisits ?? this.historyVisits,
     );
   }
 }
@@ -64,6 +68,11 @@ class VisitChatNotifier extends Notifier<VisitChatState> {
       } else {
         state = state.copyWith(messages: messages);
       }
+    });
+
+    // Fetch visit history separately
+    _repository.getVisits(_params.patientId).then((visits) {
+      state = state.copyWith(historyVisits: visits);
     });
 
     ref.onDispose(() {

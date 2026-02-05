@@ -4,6 +4,8 @@ import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import '../../domain/entities/chat_message.dart';
+import '../../../patients/infrastructure/dtos/patient_dtos.dart';
+import '../../../patients/domain/entities/patient_entity.dart';
 
 class VisitChatRepository {
   final FirebaseFirestore _firestore;
@@ -22,6 +24,24 @@ class VisitChatRepository {
         .orderBy('timestamp', descending: false)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+  }
+
+  Future<List<VisitEntity>> getVisits(String patientId) async {
+    try {
+      final snapshot = await _firestore
+          .collection('patients')
+          .doc(patientId)
+          .collection('visits')
+          .orderBy('date', descending: true)
+          .get();
+
+      return snapshot.docs.map((doc) {
+        return VisitDto.fromFirestore(doc).toDomain();
+      }).toList();
+    } catch (e) {
+      print('Error fetching visits: $e');
+      return [];
+    }
   }
 
   Future<void> saveMessage({

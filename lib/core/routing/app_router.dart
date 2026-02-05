@@ -1,4 +1,4 @@
-// material.dart import removed
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -36,24 +36,34 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      GoRoute(
-          path: '/register',
-          builder: (context, state) => const RegisterScreen()),
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const DoctorDashboardScreen(),
-      ),
-      GoRoute(
-        path: '/patient-details',
-        builder: (context, state) {
-          final patient = state.extra as PatientEntity;
-          return PatientDetailsScreen(patient: patient);
+      ShellRoute(
+        builder: (context, state, child) {
+          return SelectionArea(
+            child: child,
+          );
         },
-      ),
-      GoRoute(
-        path: '/add-patient',
-        builder: (context, state) => const AddPatientScreen(),
+        routes: [
+          GoRoute(
+              path: '/login', builder: (context, state) => const LoginScreen()),
+          GoRoute(
+              path: '/register',
+              builder: (context, state) => const RegisterScreen()),
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const DoctorDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/patient-details',
+            builder: (context, state) {
+              final patient = state.extra as PatientEntity;
+              return PatientDetailsScreen(patient: patient);
+            },
+          ),
+          GoRoute(
+            path: '/add-patient',
+            builder: (context, state) => const AddPatientScreen(),
+          ),
+        ],
       ),
     ],
   );

@@ -6,7 +6,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../domain/entities/patient_entity.dart';
-import '../../../chat/presentation/widgets/ai_chat_widget.dart';
 import 'add_edit_visit_screen.dart';
 import '../../../visit_chat/presentation/screens/visit_chat_screen.dart';
 
@@ -22,8 +21,6 @@ class PatientDetailsScreen extends ConsumerStatefulWidget {
 
 class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
     with SingleTickerProviderStateMixin {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  bool _isChatOpenDesktop = false; // Only used for desktop toggle
   late TabController _tabController;
 
   @override
@@ -49,16 +46,8 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
 
         return SelectionArea(
           child: Scaffold(
-            key: _scaffoldKey,
             backgroundColor: AppTheme.backgroundLight,
             appBar: _buildAppBar(isDesktop),
-            endDrawer: isDesktop
-                ? null
-                : Drawer(
-                    width: MediaQuery.of(context).size.width * 0.85,
-                    child:
-                        SafeArea(child: AIChatWidget(patient: widget.patient)),
-                  ),
             body: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -123,17 +112,6 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
                     ),
                   ),
                 ),
-                // Desktop Chat Sidebar
-                if (isDesktop && _isChatOpenDesktop) ...[
-                  Container(
-                    width: 1,
-                    color: Colors.grey.withOpacity(0.2),
-                  ),
-                  SizedBox(
-                    width: 400,
-                    child: AIChatWidget(patient: widget.patient),
-                  ),
-                ],
               ],
             ),
           ),
@@ -152,32 +130,6 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
       elevation: 0,
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: FilledButton.tonalIcon(
-            onPressed: () {
-              if (isDesktop) {
-                setState(() {
-                  _isChatOpenDesktop = !_isChatOpenDesktop;
-                });
-              } else {
-                _scaffoldKey.currentState?.openEndDrawer();
-              }
-            },
-            icon: Icon(
-                isDesktop && _isChatOpenDesktop
-                    ? Icons.chat_bubble
-                    : Icons.chat_bubble_outline,
-                size: 20),
-            label: const Text('AI Assistant'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.primaryGreen.withOpacity(0.1),
-              foregroundColor: AppTheme.primaryGreen,
-            ),
-          ),
-        ),
-      ],
     );
   }
 

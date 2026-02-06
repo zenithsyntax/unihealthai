@@ -9,6 +9,7 @@ import '../../application/patient_notifier.dart';
 import '../../application/patient_state.dart';
 import '../../domain/entities/patient_entity.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../chat/presentation/widgets/dashboard_ai_chat_container.dart';
 
 class DoctorDashboardScreen extends ConsumerStatefulWidget {
   const DoctorDashboardScreen({super.key});
@@ -19,6 +20,7 @@ class DoctorDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -51,7 +53,12 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
 
     return SelectionArea(
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: AppTheme.backgroundLight,
+        endDrawer: Drawer(
+          width: MediaQuery.of(context).size.width, // Full screen width
+          child: const DashboardAIChatContainer(),
+        ),
         body: SafeArea(
           child: CustomScrollView(
             slivers: [
@@ -167,6 +174,20 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
                   ],
                 ),
               );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: IconButton.filledTonal(
+            icon: const Icon(Icons.chat_bubble_outline,
+                color: AppTheme.primaryGreen),
+            tooltip: 'AI Assistant',
+            style: IconButton.styleFrom(
+              backgroundColor: AppTheme.primaryGreen.withOpacity(0.1),
+            ),
+            onPressed: () {
+              _scaffoldKey.currentState?.openEndDrawer();
             },
           ),
         )

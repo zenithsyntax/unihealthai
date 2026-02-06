@@ -9,7 +9,7 @@ import '../../patients/domain/entities/patient_entity.dart';
 
 typedef ChatParams = ({
   String patientId,
-  PatientEntity patient,
+  PatientEntity? patient, // Made nullable
 });
 
 final chatParamsProvider = Provider<ChatParams>((ref) {
@@ -63,13 +63,66 @@ class ChatNotifier extends Notifier<ChatState> {
     return ChatState(isLoading: true);
   }
 
-  String _buildContextString(PatientEntity patient) {
-    return '''
-[Patient Summary]
-Name: ${patient.name}
-Details: ${patient.age}y ${patient.gender}, ${patient.bloodType}
-Critical: ${patient.hasDiabetes ? 'Diabetes' : ''} ${patient.hasHeartCondition ? 'Heart Condition' : ''} ${patient.drugAllergyDetails != null ? 'Allergies: ${patient.drugAllergyDetails}' : ''}
+  String _buildContextString(PatientEntity? patient) {
+    if (patient == null) {
+      return '''
+SYSTEM INSTRUCTION: You are an advanced medical AI assistant helping a doctor.
+Your goal is to answer general medical questions or assist with administrative tasks.
+Use professional medical terminology but be concise.
 ''';
+    }
+
+    print('Building context for patient: ${patient.name}');
+
+    final StringBuffer buffer = StringBuffer();
+    buffer.writeln(
+        'SYSTEM INSTRUCTION: You are an advanced medical AI assistant helping a doctor.');
+    buffer.writeln(
+        'Your goal is to answer questions about the specific patient described below.');
+    buffer.writeln('Use professional medical terminology but be concise.');
+    buffer.writeln(
+        'If the user asks about something not in the patient record, state that you do not have that information.');
+    buffer.writeln('');
+    buffer.writeln('[PATIENT PROFILE]');
+    buffer.writeln('Name: ${patient.name}');
+    buffer.writeln('ID: ${patient.id}');
+    buffer.writeln('Age: ${patient.age} years');
+    buffer.writeln('Gender: ${patient.gender}');
+    buffer.writeln('Blood Type: ${patient.bloodType}');
+    buffer.writeln('Contact: ${patient.contactNumber}');
+    buffer.writeln('');
+    buffer.writeln('[MEDICAL SUMMARY]');
+    buffer.writeln('Conditions: ${[
+      if (patient.hasDiabetes) 'Diabetes',
+      if (patient.hasHeartCondition) 'Heart Condition',
+      if (patient.hasAsthma) 'Asthma',
+      if (patient.hasHighBloodPressure) 'High Blood Pressure'
+    ].join(', ')}');
+    buffer
+        .writeln('Allergies: ${patient.drugAllergyDetails ?? "None recorded"}');
+    buffer.writeln(
+        'Current Meds: ${patient.currentMedications ?? "None recorded"}');
+    buffer.writeln('Surgical Hx: ${patient.surgeryDetails ?? "None"}');
+    buffer.writeln('Family Hx: ${patient.familyMedicalHistory ?? "None"}');
+    buffer.writeln('');
+
+    if (patient.visits.isNotEmpty) {
+      buffer.writeln('[RECENT VISITS]');
+      // Sort visits by date descending
+      final sortedVisits = List.of(patient.visits)
+        ..sort((a, b) => b.date.compareTo(a.date));
+
+      // Take last 3 visits
+      for (final visit in sortedVisits.take(3)) {
+        buffer.writeln('- Date: ${visit.date.toString().split(' ')[0]}');
+        buffer.writeln('  Diagnosis: ${visit.diagnosis}');
+        buffer.writeln('  Assessment: ${visit.assessment}');
+        buffer.writeln('  Prescription: ${visit.prescription}');
+        buffer.writeln('');
+      }
+    }
+
+    return buffer.toString();
   }
 
   Future<void> sendMessage(String text,
@@ -93,8 +146,9 @@ Critical: ${patient.hasDiabetes ? 'Diabetes' : ''} ${patient.hasHeartCondition ?
 
     try {
       // 2. Call AI
+      final contextString = _buildContextString(_params.patient);
       String prompt = '''
-${_buildContextString(_params.patient)}
+$contextString
 
 User Query: $text
 ''';

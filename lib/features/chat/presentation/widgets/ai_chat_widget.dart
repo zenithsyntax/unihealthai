@@ -10,9 +10,14 @@ import '../../application/chat_notifier.dart';
 import '../../../visit_chat/domain/entities/chat_message.dart';
 
 class AIChatWidget extends ConsumerStatefulWidget {
-  final PatientEntity patient;
+  final PatientEntity? patient;
+  final VoidCallback? onBack;
 
-  const AIChatWidget({super.key, required this.patient});
+  const AIChatWidget({
+    super.key,
+    this.patient,
+    this.onBack,
+  });
 
   @override
   ConsumerState<AIChatWidget> createState() => _AIChatWidgetState();
@@ -24,18 +29,19 @@ class _AIChatWidgetState extends ConsumerState<AIChatWidget> {
     return ProviderScope(
       overrides: [
         chatParamsProvider.overrideWithValue((
-          patientId: widget.patient.id,
+          patientId: widget.patient?.id ?? 'dashboard_general_chat',
           patient: widget.patient,
         )),
         chatNotifierProvider.overrideWith(() => ChatNotifier()),
       ],
-      child: const _AIChatContent(),
+      child: _AIChatContent(onBack: widget.onBack),
     );
   }
 }
 
 class _AIChatContent extends ConsumerStatefulWidget {
-  const _AIChatContent();
+  final VoidCallback? onBack;
+  const _AIChatContent({this.onBack});
 
   @override
   ConsumerState<_AIChatContent> createState() => _AIChatContentState();
@@ -57,7 +63,9 @@ class _AIChatContentState extends ConsumerState<_AIChatContent> {
   String? _currentMentionFilter;
   int _mentionStartIndex = -1;
 
-  Map<String, String> _getMentionOptions(PatientEntity p) {
+  Map<String, String> _getMentionOptions(PatientEntity? p) {
+    if (p == null) return {};
+
     return {
       // 🧍 Personal / Demographics
       'first_name': p.firstName,
@@ -372,6 +380,12 @@ class _AIChatContentState extends ConsumerState<_AIChatContent> {
                   ),
                   centerTitle: false,
                   automaticallyImplyLeading: false,
+                  leading: widget.onBack != null
+                      ? IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: widget.onBack,
+                        )
+                      : null,
                   elevation: 0,
                   scrolledUnderElevation: 0,
                   backgroundColor: Colors.white,

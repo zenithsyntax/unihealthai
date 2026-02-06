@@ -375,18 +375,6 @@ class _AIChatContentState extends ConsumerState<_AIChatContent> {
                   elevation: 0,
                   scrolledUnderElevation: 0,
                   backgroundColor: Colors.white,
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        // Handle close based on context (Drawer or Sidebar)
-                        if (Scaffold.of(context).hasEndDrawer &&
-                            Scaffold.of(context).isEndDrawerOpen) {
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                  ],
                 ),
                 Expanded(
                   child: chatState.messages.isEmpty && !chatState.isLoading

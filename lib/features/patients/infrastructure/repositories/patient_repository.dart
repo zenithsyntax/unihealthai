@@ -80,10 +80,12 @@ class PatientRepository implements IPatientRepository {
   Future<Either<Failure, Unit>> addPatient(PatientEntity patient) async {
     try {
       final patientDto = PatientDto.fromDomain(patient);
+      final json = Map<String, dynamic>.from(patientDto.toJson());
+      json.remove('visits');
       await _firestore
           .collection('patients')
           .doc(patient.id.isEmpty ? null : patient.id)
-          .set(patientDto.toJson());
+          .set(json);
       return const Right(unit);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -180,10 +182,9 @@ class PatientRepository implements IPatientRepository {
   Future<Either<Failure, Unit>> updatePatient(PatientEntity patient) async {
     try {
       final patientDto = PatientDto.fromDomain(patient);
-      await _firestore
-          .collection('patients')
-          .doc(patient.id)
-          .update(patientDto.toJson());
+      final json = Map<String, dynamic>.from(patientDto.toJson());
+      json.remove('visits');
+      await _firestore.collection('patients').doc(patient.id).update(json);
       return const Right(unit);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

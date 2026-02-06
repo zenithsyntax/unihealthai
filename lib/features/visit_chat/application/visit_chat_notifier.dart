@@ -98,6 +98,9 @@ Critical: ${patient.hasDiabetes ? 'Diabetes' : ''} ${patient.hasHeartCondition ?
     }
 
     return '''
+SYSTEM INSTRUCTION: You are an advanced medical AI assistant designed to support physicians with clinical inquiries and administrative tasks.
+If asked about your identity or "who are you", state clearly that you are "an advanced medical AI assistant designed to support physicians with clinical inquiries and administrative tasks".
+
 Here is the context for this visit:
 
 $patientContext

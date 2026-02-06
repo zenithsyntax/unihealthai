@@ -66,9 +66,10 @@ class ChatNotifier extends Notifier<ChatState> {
   String _buildContextString(PatientEntity? patient) {
     if (patient == null) {
       return '''
-SYSTEM INSTRUCTION: You are an advanced medical AI assistant helping a doctor.
+SYSTEM INSTRUCTION: You are an advanced medical AI assistant designed to support physicians with clinical inquiries and administrative tasks.
 Your goal is to answer general medical questions or assist with administrative tasks.
 Use professional medical terminology but be concise.
+If asked about your identity or "who are you", state clearly that you are "an advanced medical AI assistant designed to support physicians with clinical inquiries and administrative tasks".
 ''';
     }
 
@@ -76,7 +77,9 @@ Use professional medical terminology but be concise.
 
     final StringBuffer buffer = StringBuffer();
     buffer.writeln(
-        'SYSTEM INSTRUCTION: You are an advanced medical AI assistant helping a doctor.');
+        'SYSTEM INSTRUCTION: You are an advanced medical AI assistant designed to support physicians with clinical inquiries and administrative tasks.');
+    buffer.writeln(
+        'If asked about your identity or "who are you", state clearly that you are "an advanced medical AI assistant designed to support physicians with clinical inquiries and administrative tasks".');
     buffer.writeln(
         'Your goal is to answer questions about the specific patient described below.');
     buffer.writeln('Use professional medical terminology but be concise.');

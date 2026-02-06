@@ -38,9 +38,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       ShellRoute(
         builder: (context, state, child) {
-          return SelectionArea(
-            child: child,
-          );
+          return child;
         },
         routes: [
           GoRoute(

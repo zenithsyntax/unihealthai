@@ -47,89 +47,95 @@ class _PatientDetailsScreenState extends ConsumerState<PatientDetailsScreen>
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 900;
 
-        return Scaffold(
-          key: _scaffoldKey,
-          backgroundColor: AppTheme.backgroundLight,
-          appBar: _buildAppBar(isDesktop),
-          endDrawer: isDesktop
-              ? null
-              : Drawer(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: const SafeArea(child: AIChatWidget()),
-                ),
-          body: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 3,
-                child: Column(
-                  children: [
-                    _buildHeader(isDesktop),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                            bottom: BorderSide(
-                                color: Colors.grey.withOpacity(0.2))),
-                      ),
-                      child: TabBar(
-                        controller: _tabController,
-                        labelColor: AppTheme.primaryGreen,
-                        unselectedLabelColor: AppTheme.textGrey,
-                        indicatorColor: AppTheme.primaryGreen,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        labelStyle: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                        tabs: const [
-                          Tab(text: 'Overview'),
-                          Tab(text: 'Visit History'),
-                        ],
-                      ),
+        return SelectionArea(
+          child: Scaffold(
+            key: _scaffoldKey,
+            backgroundColor: AppTheme.backgroundLight,
+            appBar: _buildAppBar(isDesktop),
+            endDrawer: isDesktop
+                ? null
+                : Drawer(
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    child:
+                        SafeArea(child: AIChatWidget(patient: widget.patient)),
+                  ),
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Scaffold(
+                    backgroundColor: Colors.transparent,
+                    body: Column(
+                      children: [
+                        _buildHeader(isDesktop),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border(
+                                bottom: BorderSide(
+                                    color: Colors.grey.withOpacity(0.2))),
+                          ),
+                          child: TabBar(
+                            controller: _tabController,
+                            labelColor: AppTheme.primaryGreen,
+                            unselectedLabelColor: AppTheme.textGrey,
+                            indicatorColor: AppTheme.primaryGreen,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            labelStyle: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                            tabs: const [
+                              Tab(text: 'Overview'),
+                              Tab(text: 'Visit History'),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: [
+                              _buildOverviewTab(isDesktop),
+                              _buildVisitsTab(isDesktop),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _buildOverviewTab(isDesktop),
-                          _buildVisitsTab(isDesktop),
-                        ],
-                      ),
+                    floatingActionButton: FloatingActionButton.extended(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddEditVisitScreen(
+                              patientId: widget.patient.id,
+                            ),
+                          ),
+                        );
+                      },
+                      backgroundColor: AppTheme.primaryGreen,
+                      elevation: 4,
+                      icon: const Icon(Icons.add, color: Colors.white),
+                      label: const Text('New Visit',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5)),
                     ),
-                  ],
-                ),
-              ),
-              // Desktop Chat Sidebar
-              if (isDesktop && _isChatOpenDesktop) ...[
-                Container(
-                  width: 1,
-                  color: Colors.grey.withOpacity(0.2),
-                ),
-                SizedBox(
-                  width: 400,
-                  child: const AIChatWidget(),
-                ),
-              ],
-            ],
-          ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddEditVisitScreen(
-                    patientId: widget.patient.id,
                   ),
                 ),
-              );
-            },
-            backgroundColor: AppTheme.primaryGreen,
-            elevation: 4,
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text('New Visit',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5)),
+                // Desktop Chat Sidebar
+                if (isDesktop && _isChatOpenDesktop) ...[
+                  Container(
+                    width: 1,
+                    color: Colors.grey.withOpacity(0.2),
+                  ),
+                  SizedBox(
+                    width: 400,
+                    child: AIChatWidget(patient: widget.patient),
+                  ),
+                ],
+              ],
+            ),
           ),
         );
       },

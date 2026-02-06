@@ -49,43 +49,45 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
   Widget build(BuildContext context) {
     final patientState = ref.watch(patientNotifierProvider);
 
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            _buildSliverAppBar(),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildWelcomeSection(patientState),
-                    const SizedBox(height: 24),
-                    _buildSectionHeader('My Patients'),
-                    const SizedBox(height: 16),
-                    _buildSearchField(),
-                    const SizedBox(height: 16),
-                  ],
+    return SelectionArea(
+      child: Scaffold(
+        backgroundColor: AppTheme.backgroundLight,
+        body: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              _buildSliverAppBar(),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildWelcomeSection(patientState),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('My Patients'),
+                      const SizedBox(height: 16),
+                      _buildSearchField(),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            _buildPatientList(patientState),
-            const SliverToBoxAdapter(
-                child: SizedBox(height: 80)), // Padding for FAB
-          ],
+              _buildPatientList(patientState),
+              const SliverToBoxAdapter(
+                  child: SizedBox(height: 80)), // Padding for FAB
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.push('/add-patient');
-        },
-        backgroundColor: AppTheme.primaryGreen,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: Text('Add Patient',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-        elevation: 4,
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            context.push('/add-patient');
+          },
+          backgroundColor: AppTheme.primaryGreen,
+          icon: const Icon(Icons.add_rounded, color: Colors.white),
+          label: Text('Add Patient',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+          elevation: 4,
+        ),
       ),
     );
   }
@@ -219,12 +221,9 @@ class _DoctorDashboardScreenState extends ConsumerState<DoctorDashboardScreen> {
             ),
           ],
         ),
-      
       ],
     );
   }
-
- 
 
   Widget _buildSectionHeader(String title) {
     return Padding(
